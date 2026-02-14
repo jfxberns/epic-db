@@ -42,11 +42,11 @@ Plans:
   2. User can view all relationships between tables -- both declared foreign keys and implicit relationships from MSysRelationships and lookup fields
   3. User can view all indexes and primary key / foreign key constraints per table
   4. User can view sample data (5-10 rows) from each table with row counts and can identify which tables appear abandoned or unused
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Extend db_reader.py with schema extraction functions + extract relationships document
+- [ ] 02-02-PLAN.md — Per-table schema documents (columns, indexes, sample data) + data profiling with abandoned table analysis
 
 ### Phase 3: Logic and Interface Extraction
 **Goal**: User has complete documentation of all queries, VBA business logic, forms, and reports -- the full logic and interface layer of the database
@@ -88,6 +88,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Setup and Validation | 2/2 | ✓ Complete | 2026-02-14 |
-| 2. Schema Foundation | 0/TBD | Not started | - |
+| 2. Schema Foundation | 0/2 | Not started | - |
 | 3. Logic and Interface Extraction | 0/TBD | Not started | - |
 | 4. Translation and Synthesis | 0/TBD | Not started | - |
