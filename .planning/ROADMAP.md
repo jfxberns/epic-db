@@ -27,11 +27,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. User can run a Python script that reads table data from epic_db.accdb on macOS and outputs correctly rendered Thai text
   2. User can view a complete inventory of every object in the database (tables, queries, forms, reports, modules, macros) with counts per type
   3. User can confirm whether a Windows environment is needed for form/report/VBA extraction, and if needed, that environment is accessible
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Environment setup, db_reader module, and Thai encoding validation
+- [ ] 01-02-PLAN.md — Complete object inventory and Windows assessment
 
 ### Phase 2: Schema Foundation
 **Goal**: User has complete documentation of every table, column, relationship, and index in the database with sample data
@@ -87,7 +87,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Setup and Validation | 0/TBD | Not started | - |
+| 1. Setup and Validation | 0/2 | Planned | - |
 | 2. Schema Foundation | 0/TBD | Not started | - |
 | 3. Logic and Interface Extraction | 0/TBD | Not started | - |
 | 4. Translation and Synthesis | 0/TBD | Not started | - |
