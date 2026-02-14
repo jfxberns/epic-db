@@ -9,18 +9,18 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 
 ## Current Position
 
-Phase: 2 of 4 (Schema Foundation)
-Plan: 1 of 2 in current phase (02-01 complete)
-Status: 02-01 complete, ready for 02-02
-Last activity: 2026-02-14 -- Completed 02-01 (Schema Extraction & Relationships)
+Phase: 2 of 4 (Schema Foundation) -- COMPLETE
+Plan: 2 of 2 in current phase (02-02 complete)
+Status: Phase 2 complete, ready for Phase 3
+Last activity: 2026-02-14 -- Completed 02-02 (Per-Table Docs & Data Profiling)
 
-Progress: [███░░░░░░░] 30%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: ~8 min
+- Total plans completed: 4
+- Average duration: ~7 min
 - Total execution time: ~0.4 hours
 
 **By Phase:**
@@ -28,10 +28,10 @@ Progress: [███░░░░░░░] 30%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-setup-and-validation | 2/2 | ~18 min | ~9 min |
-| 02-schema-foundation | 1/2 | ~5 min | ~5 min |
+| 02-schema-foundation | 2/2 | ~7 min | ~3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~15 min), 01-02 (~3 min), 02-01 (~5 min)
+- Last 5 plans: 01-01 (~15 min), 01-02 (~3 min), 02-01 (~5 min), 02-02 (~2 min)
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -56,6 +56,9 @@ Recent decisions affecting current work:
 - [02-01]: Moved AccessTable/TableObj imports to module level for reuse across schema extraction functions
 - [02-01]: FK indexes with idx_num >= real_index_count have empty column lists; MSysRelationships is the authoritative source for FK column mappings
 - [02-01]: 14 relationships total: 8 table-to-table, 4 table-to-query, 2 system (MSysNavPane)
+- [02-02]: Used tabulate pipe-format for all generated markdown tables
+- [02-02]: Decimal binary values shown as [Binary: N bytes] (known parser limitation for 31-byte format)
+- [02-02]: คะแนนที่ลูกค้าใช้ไป identified as Likely Abandoned (0 rows + no relationships)
 
 ### Pending Todos
 
@@ -70,5 +73,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 02-01-PLAN.md -- Schema extraction functions + relationships documented
-Resume file: .planning/phases/02-schema-foundation/02-01-SUMMARY.md
+Stopped at: Completed 02-02-PLAN.md -- Phase 2 complete (per-table docs + data profiling)
+Resume file: .planning/phases/02-schema-foundation/02-02-SUMMARY.md
