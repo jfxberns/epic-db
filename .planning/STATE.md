@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-14)
 
 **Core value:** Extract and document all components from the Access database with enough fidelity that a complete rebuild can be executed from the assessment alone
-**Current focus:** Phase 2 - Schema Foundation
+**Current focus:** Phase 3 - Logic and Interface Extraction
 
 ## Current Position
 
-Phase: 2 of 4 (Schema Foundation) -- COMPLETE
-Plan: 2 of 2 in current phase (02-02 complete)
-Status: Phase 2 complete, ready for Phase 3
-Last activity: 2026-02-14 -- Completed 02-02 (Per-Table Docs & Data Profiling)
+Phase: 3 of 4 (Logic and Interface Extraction)
+Plan: 1 of 3 in current phase (03-01 complete)
+Status: 03-01 complete, ready for 03-02
+Last activity: 2026-02-15 -- Completed 03-01 (Query SQL Extraction & Assessment)
 
-Progress: [████░░░░░░] 40%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~7 min
-- Total execution time: ~0.4 hours
+- Total plans completed: 5
+- Average duration: ~6 min
+- Total execution time: ~0.5 hours
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [████░░░░░░] 40%
 |-------|-------|-------|----------|
 | 01-setup-and-validation | 2/2 | ~18 min | ~9 min |
 | 02-schema-foundation | 2/2 | ~7 min | ~3.5 min |
+| 03-logic-and-interface-extraction | 1/3 | ~6 min | ~6 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~15 min), 01-02 (~3 min), 02-01 (~5 min), 02-02 (~2 min)
-- Trend: Accelerating
+- Last 5 plans: 01-02 (~3 min), 02-01 (~5 min), 02-02 (~2 min), 03-01 (~6 min)
+- Trend: Consistent (~4 min avg recent)
 
 *Updated after each plan completion*
 
@@ -59,6 +60,12 @@ Recent decisions affecting current work:
 - [02-02]: Used tabulate pipe-format for all generated markdown tables
 - [02-02]: Decimal binary values shown as [Binary: N bytes] (known parser limitation for 31-byte format)
 - [02-02]: คะแนนที่ลูกค้าใช้ไป identified as Likely Abandoned (0 rows + no relationships)
+- [03-01]: Java 11 added as bridge dependency for Jackcess query SQL extraction on macOS
+- [03-01]: Jackcess found 33 user queries (vs 32 from MSysObjects) -- qry_ร้านค้าส่งของให้ก่อน was previously invisible
+- [03-01]: All queries confirmed SELECT (32) or UNION (1) from actual SQL -- MSysObjects flags were correct
+- [03-01]: Hidden ~sq_* subqueries categorized: ~sq_c (subform, 8), ~sq_d (lookup, 14), ~sq_r (report, 7)
+- [03-01]: Hub tables: สินค้า (26 refs), รายละเอียดออเดอร์ (23 refs) -- core business data
+- [03-01]: Hub query: qry สินค้าในแต่ละออเดอร์ร้านค้า (11 dependents) -- central to shop order processing
 
 ### Pending Todos
 
@@ -72,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-14
-Stopped at: Completed 02-02-PLAN.md -- Phase 2 complete (per-table docs + data profiling)
-Resume file: .planning/phases/02-schema-foundation/02-02-SUMMARY.md
+Last session: 2026-02-15
+Stopped at: Completed 03-01-PLAN.md -- Query SQL extraction and assessment
+Resume file: .planning/phases/03-logic-and-interface-extraction/03-01-SUMMARY.md
