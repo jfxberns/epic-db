@@ -30,8 +30,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Environment setup, db_reader module, and Thai encoding validation
-- [ ] 01-02-PLAN.md — Complete object inventory and Windows assessment
+- [ ] 01-01-PLAN.md — Install access-parser, create db_reader module, validate Thai encoding (user checkpoint)
+- [ ] 01-02-PLAN.md — Generate complete object inventory with metadata and Windows assessment
 
 ### Phase 2: Schema Foundation
 **Goal**: User has complete documentation of every table, column, relationship, and index in the database with sample data
