@@ -85,38 +85,38 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | — | Pending |
-| SETUP-02 | — | Pending |
-| SETUP-03 | — | Pending |
-| SETUP-04 | — | Pending |
-| SCHM-01 | — | Pending |
-| SCHM-02 | — | Pending |
-| SCHM-03 | — | Pending |
-| SCHM-04 | — | Pending |
-| SCHM-05 | — | Pending |
-| QURY-01 | — | Pending |
-| QURY-02 | — | Pending |
-| QURY-03 | — | Pending |
-| VBA-01 | — | Pending |
-| VBA-02 | — | Pending |
-| VBA-03 | — | Pending |
-| VBA-04 | — | Pending |
-| VBA-05 | — | Pending |
-| FORM-01 | — | Pending |
-| FORM-02 | — | Pending |
-| FORM-03 | — | Pending |
-| TRNS-01 | — | Pending |
-| TRNS-02 | — | Pending |
-| TRNS-03 | — | Pending |
-| SYNTH-01 | — | Pending |
-| SYNTH-02 | — | Pending |
-| SYNTH-03 | — | Pending |
+| SETUP-01 | Phase 1 | Pending |
+| SETUP-02 | Phase 1 | Pending |
+| SETUP-03 | Phase 1 | Pending |
+| SETUP-04 | Phase 1 | Pending |
+| SCHM-01 | Phase 2 | Pending |
+| SCHM-02 | Phase 2 | Pending |
+| SCHM-03 | Phase 2 | Pending |
+| SCHM-04 | Phase 2 | Pending |
+| SCHM-05 | Phase 2 | Pending |
+| QURY-01 | Phase 3 | Pending |
+| QURY-02 | Phase 3 | Pending |
+| QURY-03 | Phase 3 | Pending |
+| VBA-01 | Phase 3 | Pending |
+| VBA-02 | Phase 3 | Pending |
+| VBA-03 | Phase 3 | Pending |
+| VBA-04 | Phase 3 | Pending |
+| VBA-05 | Phase 3 | Pending |
+| FORM-01 | Phase 3 | Pending |
+| FORM-02 | Phase 3 | Pending |
+| FORM-03 | Phase 3 | Pending |
+| TRNS-01 | Phase 4 | Pending |
+| TRNS-02 | Phase 4 | Pending |
+| TRNS-03 | Phase 4 | Pending |
+| SYNTH-01 | Phase 4 | Pending |
+| SYNTH-02 | Phase 4 | Pending |
+| SYNTH-03 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 26 total
-- Mapped to phases: 0
-- Unmapped: 26 ⚠️
+- Mapped to phases: 26
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-14*
-*Last updated: 2026-02-14 after initial definition*
+*Last updated: 2026-02-14 after roadmap creation*
