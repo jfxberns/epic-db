@@ -13,7 +13,7 @@ This roadmap delivers a complete extraction and documentation of Epic Gear's Acc
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Setup and Validation** - Validate extraction tooling, Thai encoding, and produce complete object inventory
-- [ ] **Phase 2: Schema Foundation** - Extract all table definitions, relationships, indexes, and data profiles
+- [x] **Phase 2: Schema Foundation** - Extract all table definitions, relationships, indexes, and data profiles
 - [ ] **Phase 3: Logic and Interface Extraction** - Extract all queries, VBA modules, forms, and reports with business logic documentation
 - [ ] **Phase 4: Translation and Synthesis** - Translate all Thai content to English and produce the cross-referenced rebuild blueprint
 
@@ -45,8 +45,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Extend db_reader.py with schema extraction functions + extract relationships document
-- [ ] 02-02-PLAN.md — Per-table schema documents (columns, indexes, sample data) + data profiling with abandoned table analysis
+- [x] 02-01-PLAN.md — Extend db_reader.py with schema extraction functions + extract relationships document
+- [x] 02-02-PLAN.md — Per-table schema documents (columns, indexes, sample data) + data profiling with abandoned table analysis
 
 ### Phase 3: Logic and Interface Extraction
 **Goal**: User has complete documentation of all queries, VBA business logic, forms, and reports -- the full logic and interface layer of the database
@@ -88,6 +88,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Setup and Validation | 2/2 | ✓ Complete | 2026-02-14 |
-| 2. Schema Foundation | 0/2 | Not started | - |
+| 2. Schema Foundation | 2/2 | ✓ Complete | 2026-02-14 |
 | 3. Logic and Interface Extraction | 0/TBD | Not started | - |
 | 4. Translation and Synthesis | 0/TBD | Not started | - |
