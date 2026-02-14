@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-14)
 
 **Core value:** Extract and document all components from the Access database with enough fidelity that a complete rebuild can be executed from the assessment alone
-**Current focus:** Phase 1 - Setup and Validation
+**Current focus:** Phase 2 - Schema Foundation
 
 ## Current Position
 
-Phase: 1 of 4 (Setup and Validation) -- COMPLETE
-Plan: 2 of 2 in current phase (all plans complete)
-Status: Phase 1 complete, ready for Phase 2
-Last activity: 2026-02-14 -- Completed 01-02 (Database Inventory)
+Phase: 2 of 4 (Schema Foundation)
+Plan: 1 of 2 in current phase (02-01 complete)
+Status: 02-01 complete, ready for 02-02
+Last activity: 2026-02-14 -- Completed 02-01 (Schema Extraction & Relationships)
 
-Progress: [██░░░░░░░░] 20%
+Progress: [███░░░░░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: ~9 min
-- Total execution time: ~0.3 hours
+- Total plans completed: 3
+- Average duration: ~8 min
+- Total execution time: ~0.4 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-setup-and-validation | 2/2 | ~18 min | ~9 min |
+| 02-schema-foundation | 1/2 | ~5 min | ~5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (~15 min), 01-02 (~3 min)
+- Last 5 plans: 01-01 (~15 min), 01-02 (~3 min), 02-01 (~5 min)
 - Trend: Accelerating
 
 *Updated after each plan completion*
@@ -52,6 +53,9 @@ Recent decisions affecting current work:
 - [01-02]: Type=8 MSysObjects entries are relationships (12 table-to-table links detected)
 - [01-02]: Windows IS NEEDED for Phase 3: 17 forms and 25 reports require Access COM for content extraction
 - [01-02]: Zero modules and zero macros in database (only temp system macro exists)
+- [02-01]: Moved AccessTable/TableObj imports to module level for reuse across schema extraction functions
+- [02-01]: FK indexes with idx_num >= real_index_count have empty column lists; MSysRelationships is the authoritative source for FK column mappings
+- [02-01]: 14 relationships total: 8 table-to-table, 4 table-to-query, 2 system (MSysNavPane)
 
 ### Pending Todos
 
@@ -66,5 +70,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 01-02-PLAN.md -- Phase 1 complete, ready for Phase 2
-Resume file: .planning/phases/01-setup-and-validation/01-02-SUMMARY.md
+Stopped at: Completed 02-01-PLAN.md -- Schema extraction functions + relationships documented
+Resume file: .planning/phases/02-schema-foundation/02-01-SUMMARY.md
