@@ -341,3 +341,504 @@ This glossary is the single source of truth for all Thai-to-English translations
 | อรุณี | Arunee | proper_noun | Staff name |
 | วันเพ็ญ | Wanpen | proper_noun | Staff name |
 | คุณต้าร์ทองเหลือง | Khun Tar Thonglueang | proper_noun | Producer/packer name |
+
+
+### English Alphabetical Index
+
+| English | Thai | Domain | Category |
+|---------|------|--------|----------|
+| additional_details | รายละเอียดเพิ่มเติม | Financial | column_name |
+| address | ที่อยู่ | Customers | column_name |
+| already_asked | ถามแล้ว | Customers | enum_value |
+| Arunee | อรุณี | Proper Nouns | proper_noun |
+| assign_invoice_number | qryกำหนดเลขที่inv | Financial | query_name |
+| awaiting_transfer | รอโอน | Orders | enum_value |
+| balance_notification_pdf | pdf แจ้งยอด | Orders | report_name |
+| bank | ธนาคาร | Orders | column_name |
+| bead | เม็ด | Products | enum_value |
+| best_sellers_last_3_months | qry_สินค้าที่ขายดีย้อนหลัง 3 เดือน | Orders | query_name |
+| bill_end_date | วันที่เปิดบิลสุดท้าย | Orders | form_label |
+| bill_end_discount_percent | ส่วนลดท้ายบิล(%) | Orders | column_name |
+| bill_start_date | วันที่เปิดบิลเริ่มต้น | Orders | form_label |
+| bill_type_preference | เอาบิลอะไร | Customers | column_name |
+| box_number | หมายเลขกล่อง | Inventory | column_name |
+| business_branch | สาขาสถานประกอบการ | Customers | column_name |
+| cash | เงินสด | Orders | enum_value |
+| cash_or_individual | สด | Customers | enum_value |
+| Chantakan | จันทกานต์ | Proper Nouns | proper_noun |
+| closed_sunday | ปิดวันอาทิตย์ | Customers | enum_value |
+| combined_multi_order_quantities | ดูจำนวนรวมสินค้าที่สั่งหลายออเดอร์รวมกัน | Orders | query_name |
+| customer_points_subform | qry คะแนนรวมลูกค้าแต่ละคน subform | Customers | form_name |
+| customer_points_used | คะแนนที่ลูกค้าใช้ไป | Customers | table_name |
+| customer_total_points | qry คะแนนรวมลูกค้าแต่ละคน | Customers | query_name |
+| data_entry_reviewer | พนักงานตรวจการบันทึกข้อมูล | Financial | column_name |
+| data_entry_staff | พนักงานบันทึกข้อมูล | Financial | column_name |
+| date | วันที่ | Orders | column_name |
+| date_end | วันที่จบ | Orders | form_label |
+| date_start | วันที่เริ่ม | Orders | form_label |
+| document_number | เลขที่ใบสำคัญ | Inventory | calculated_field |
+| end_date | วันที่สุดท้าย | Orders | form_label |
+| enter_first_order_to_view | ใส่เลขที่ออเดอร์คนแรกที่จะดู | Customers | form_label |
+| enter_first_shop_order | ใส่เลขที่ออเดอร์ร้านแรก | Customers | form_label |
+| enter_last_order_to_view | ใส่เลขที่ออเดอร์คนสุดท้ายที่จะดู | Customers | form_label |
+| enter_last_shop_order | ใส่เลขที่ออเดอร์ร้านสุดท้าย | Customers | form_label |
+| enter_tax_invoice_number | qryใส่เลขที่ใบกำกับ | Financial | query_name |
+| FACEBOOK | FACEBOOK | Orders | enum_value |
+| facebook_messenger | เฟซบุค แมสเซนเจอร์ | Customers | column_name |
+| facebook_name | ชื่อเฟส | Customers | column_name |
+| first_name | ชื่อ | Customers | column_name |
+| first_order_number | เลขที่ออเดอร์แรก | Orders | form_label |
+| frm_salesorder_fishingshop | frm_salesorder_fishingshop | Orders | form_name |
+| frm_salesorder_retail | frm_salesorder_retail | Orders | form_name |
+| frm_stck_fishingshop | frm_stck_fishingshop | Inventory | form_name |
+| goods_issue_form | frm เบิกสินค้า | Inventory | form_name |
+| goods_receipt_details | รายละเอียดใบรับเข้าสินค้า | Inventory | report_name |
+| goods_receipt_form | frm รับเข้าสินค้า | Inventory | form_name |
+| head_office_branch | สาขาสำนักงานใหญ่ | Customers | column_name |
+| holidays | วันหยุด | Customers | column_name |
+| id | id | Orders | column_name |
+| ID | ID | Inventory | column_name |
+| inspection_staff | พนักงานตรวจเช็ค | Financial | column_name |
+| inv_end | invสุดท้าย | Orders | form_label |
+| inv_start | invเริ่มต้น | Orders | form_label |
+| invoice_address | ที่อยู่สำหรับออกใบกำกับ | Customers | column_name |
+| invoice_date | วันที่inv | Orders | column_name |
+| invoice_shop_name | ชื่อร้านสำหรับออกใบกำกับ | Customers | column_name |
+| issue_address_labels | rptทำที่อยู่เบิกสินค้า | Inventory | report_name |
+| issue_date | วันที่เบิก | Inventory | column_name |
+| issue_headers | หัวใบเบิก | Inventory | table_name |
+| issue_line_items | สินค้าในแต่ละใบเบิก | Inventory | table_name |
+| issue_line_items_subform | สินค้าในแต่ละใบเบิก Subform | Inventory | form_name |
+| issue_lookup | qry เจาะจงเลขที่ใบเบิก | Inventory | query_name |
+| issue_member_number | หมายเลขสมาชิกที่เบิก | Inventory | column_name |
+| issue_number | เลขที่ใบเบิก | Inventory | column_name |
+| issue_reason | เหตุผลการเบิก | Inventory | column_name |
+| issue_shop_code | รหัสร้านค้าที่เบิก | Inventory | column_name |
+| issuing_staff | พนักงานเบิก | Inventory | column_name |
+| kasikorn_bank | กสิกร | Orders | enum_value |
+| kerry_and_thailand_post | เคอรี่และไปรษณีย์ไทย | Customers | enum_value |
+| Khun Tar Thonglueang | คุณต้าร์ทองเหลือง | Proper Nouns | proper_noun |
+| large_pack | ซองใหญ่ | Products | enum_value |
+| last_name | นามสกุล | Customers | column_name |
+| last_order_number | เลขที่ออเดอร์สุดท้าย | Orders | form_label |
+| latest_address | ที่อยู่ล่าสุด | Customers | column_name |
+| LINE | LINE | Orders | enum_value |
+| line_name | ชื่อไลน์ | Customers | column_name |
+| line_or_facebook_name | ชื่อไลน์หรือเฟซ | Customers | column_name |
+| line_total | ราคารวม | Orders | calculated_field |
+| main_menu | หน้าหลัก | Customers | form_name |
+| manual_bonus_points | คะแนนคีย์มือเพิ่มให้ | Customers | column_name |
+| manual_points_entry | คะแนนคีย์เอง | Orders | column_name |
+| member_auto_id | หมายเลขออโต้ | Customers | column_name |
+| member_info | ข้อมูลสมาชิก | Customers | table_name |
+| member_info_form | frmข้อมูลสมาชิก | Customers | form_name |
+| member_number | หมายเลขสมาชิก | Customers | column_name |
+| mobile_phone_2 | เบอร์โทรศัพท์2(มือถือ) | Customers | column_name |
+| month_end_date | วันที่ท้ายเดือน | Orders | form_label |
+| month_start_date | วันที่ต้นเดือน | Orders | form_label |
+| monthly_invoice_number | เลขที่invoiceของแต่ละเดือน | Orders | column_name |
+| monthly_receipt_number | เลขที่ใบรับเข้าของแต่ละเดือน | Inventory | column_name |
+| net_total_incl_vat | ราคาสุทธิรวมภาษีมูลค่าเพิ่ม | Orders | calculated_field |
+| notes | หมายเหตุ | Inventory | column_name |
+| open_every_day | เปิดทุกวัน | Customers | enum_value |
+| order_channel | ช่องทางสั่งซื้อ | Orders | column_name |
+| order_detail_subreport | qry เจาะจงหมายเลขออเดอร์ subreport | Orders | report_name |
+| order_details | รายละเอียดออเดอร์ | Orders | table_name |
+| order_line_items | สินค้าในแต่ละออเดอร์ | Orders | table_name |
+| order_line_items_subform | qry สินค้าในแต่ละออเดอร์ Subform | Orders | form_name |
+| order_line_items_subform_1 | qry สินค้าในแต่ละออเดอร์ Subform1 | Orders | form_name |
+| order_lookup_by_shop_name | หาเลขที่ออเดอร์ถ้ารู้ชื่อร้าน | Orders | form_name |
+| order_number | เลขที่ออเดอร์ | Orders | column_name |
+| order_staff | พนักงานรับออเดอร์ | Orders | column_name |
+| other | อื่นๆ | Orders | enum_value |
+| other_notes | หมายเหตุอื่นๆ | Orders | column_name |
+| pack | ซอง | Products | enum_value |
+| per_shipment | ครั้ง | Products | enum_value |
+| phone_number | เบอร์โทรศัพท์ | Customers | column_name |
+| piece | ตัว | Products | enum_value |
+| please_enter_shop_code | กรุณาระบุรหัสร้านค้า | Orders | form_label |
+| points | คะแนน | Orders | calculated_field |
+| points_redeemed_1 | คะแนนที่ใช้ครั้งที่1 | Customers | column_name |
+| points_redeemed_2 | คะแนนที่ใช้ครั้งที่2 | Customers | column_name |
+| points_redeemed_3 | คะแนนที่ใช้ครั้งที่3 | Customers | column_name |
+| points_used_1 | คะแนนที่ใช้ครั้งที่ 1 | Customers | column_name |
+| points_used_2 | คะแนนที่ใช้ครั้งที่ 2 | Customers | column_name |
+| points_used_3 | คะแนนที่ใช้ครั้งที่ 3 | Customers | column_name |
+| points_used_4 | คะแนนที่ใช้ครั้งที่ 4 | Customers | column_name |
+| points_used_5 | คะแนนที่ใช้ครั้งที่ 5 | Customers | column_name |
+| post_shop_payments | qryลงยอดร้านค้า | Financial | query_name |
+| pre_vat_after_shop_discount | ราคาก่อนแวทหลังหักส่วนลดร้านค้า | Orders | calculated_field |
+| pre_vat_price | ราคาก่อนแวท | Products | column_name |
+| preferred_carrier | ขนส่งที่สะดวก | Customers | column_name |
+| preferred_contact_channel | ช่องทางติดต่อที่สะดวก | Customers | column_name |
+| price | ราคา | Products | column_name |
+| price_after_shop_discount | ราคาหลังหักส่วนลดร้านค้า | Orders | calculated_field |
+| print_addresses | ปริ้นท์ที่อยู่ | Customers | report_name |
+| print_goods_issue | ปรินท์ใบเบิกสินค้า | Inventory | report_name |
+| print_retail_addresses | ปริ้นท์ที่อยู่ลูกค้าปลีก | Customers | report_name |
+| producer_or_packer | ผู้ผลิต หรือ พนักงานแพ็ค | Inventory | column_name |
+| product_and_material_report | qryรายงานสินค้าและวัตุดิบ | Products | query_name |
+| product_code | รหัสสินค้า | Products | column_name |
+| product_sales_by_date | จำนวนที่ขายของสินค้าแต่ละตัว(ระบุวันที่) | Orders | query_name |
+| product_stock | qry สต็อคสินค้า | Inventory | query_name |
+| product_stock_form | frm_สต็อคสินค้า | Inventory | form_name |
+| products | สินค้า | Products | table_name |
+| qry stck subform2 | qry stck subform2 | Inventory | form_name |
+| quantity | จำนวน | Orders | column_name |
+| quantity_issued | จำนวนเบิก | Inventory | column_name |
+| quantity_received | จำนวนรับเข้า | Inventory | column_name |
+| quantity_sold | จำนวนขาย | Inventory | calculated_field |
+| Rattanaporn | รัตนาพร | Proper Nouns | proper_noun |
+| receipt_date | วันที่รับเข้า | Inventory | column_name |
+| receipt_headers | หัวใบรับเข้า | Inventory | table_name |
+| receipt_line_items | สินค้าในแต่ละใบรับเข้า | Inventory | table_name |
+| receipt_line_items_subform | สินค้าในแต่ละใบรับเข้า Subform | Inventory | form_name |
+| receipt_lookup | qry เจาะจงเลขที่ใบรับเข้า | Inventory | query_name |
+| receipt_number | เลขที่ใบรับเข้า | Inventory | column_name |
+| received_large_sticker | ได้สติกเกอร์ใหญ่แล้ว | Customers | column_name |
+| received_sticker | ได้สติกเกอร์หรือยัง | Customers | column_name |
+| record_created_date | วันที่สร้างข้อมูล | Customers | column_name |
+| regular_bill | บิลธรรมดา | Customers | enum_value |
+| remaining_points_after_use | qry คะแนนคงเหลือหลังจากใช้แล้ว | Customers | query_name |
+| remaining_points_form | คะแนนคงเหลือหลังจากใช้แล้ว | Customers | form_name |
+| retail_addresses_by_date | qry ที่อยู่เจาะจงโดยวันที่ (ปลีก) | Customers | query_name |
+| retail_customer_bill | บิลลูกค้าปลีก | Orders | report_name |
+| retail_invoice_name | ชื่อออกใบกำกับปลีก | Customers | column_name |
+| retail_net_total_incl_vat | ราคาสุทธิปลีกรวมภาษีมูลค่าเพิ่ม | Orders | calculated_field |
+| retail_order_line_items | qry สินค้าในแต่ละออเดอร์ปลีก | Orders | query_name |
+| retail_order_lookup | qry เจาะจงหมายเลขออเดอร์ปลีก | Orders | query_name |
+| retail_order_stock | qry สต็อคสินค้าในแต่ละออเดอร์ปลีก | Inventory | query_name |
+| retail_order_transfer_details | qry รายละเอียดการโอนแต่ละออเดอร์ปลีก | Financial | query_name |
+| retail_sales_totals | qry ยอดขายลูกค้าปลีก | Orders | query_name |
+| retail_tax_id | เลขประจำตัวผู้เสียภาษีปลีก | Customers | column_name |
+| retail_tax_invoice | ใบกำกับภาษีลูกค้าปลีก | Orders | report_name |
+| retail_tax_invoice_copy | ใบกำกับภาษีลูกค้าปลีก(สำเนา) | Orders | report_name |
+| retail_tracking_notification | ข้อมูลสำหรับแจ้งเลขพัสดุลูกค้าปลีก | Customers | report_name |
+| retail_vat | ภาษีมูลค่าเพิ่มปลีก | Orders | calculated_field |
+| RipRoy | ริปรอย | Proper Nouns | proper_noun |
+| sales_tax_report | รายงานภาษีขาย | Financial | report_name |
+| sales_tax_verification | ตรวจภาษีขาย | Financial | report_name |
+| sales_tax_verification_by_inv | ตรวจภาษีขายเรียงตามเลขinv | Financial | report_name |
+| sequence_number | ลำดับที่ | Products | column_name |
+| ship_before_payment | ส่งของให้ก่อน | Orders | enum_value |
+| ship_or_pay_first | ส่งของก่อนหรือโอนเงินก่อน | Customers | column_name |
+| shop_addresses_by_date | qry ที่อยู่เจาะจงโดยวันที่ (ร้านค้า) | Customers | query_name |
+| shop_annual_purchase_totals | qry ยอดซื้อร้านค้าทั้งปี | Orders | query_name |
+| shop_auto_id | รหัสร้านค้าออโต้ | Customers | column_name |
+| shop_bill | บิลร้านค้า | Orders | report_name |
+| shop_bill_verification | ใบตรวจบิลร้านค้า | Orders | report_name |
+| shop_code | รหัสร้านค้า | Orders | column_name |
+| shop_delivery_note | ใบส่งของร้านค้า | Orders | report_name |
+| shop_discount | ส่วนลดร้านค้า | Products | column_name |
+| shop_discount_pre_vat | ส่วนลดร้านค้าก่อนแวท | Products | column_name |
+| shop_info | ข้อมูลร้านค้า | Customers | table_name |
+| shop_name | ชื่อร้าน | Customers | column_name |
+| shop_order_line_items | qry สินค้าในแต่ละออเดอร์ร้านค้า | Orders | query_name |
+| shop_order_line_items_subform | qry สินค้าในแต่ละออเดอร์ร้านค้า subform | Orders | form_name |
+| shop_order_lookup | qry เจาะจงหมายเลขออเดอร์ร้านค้า | Orders | query_name |
+| shop_packing_list | ใบจัดสินค้าร้านค้า | Orders | report_name |
+| shop_payment_amounts | qryยอดเงินร้านค้า | Orders | query_name |
+| shop_phone | เบอร์โทรศัพท์ร้านค้า | Customers | column_name |
+| shop_price_incl_vat | ราคาร้านค้ารวมแวท | Products | column_name |
+| shop_purchase_totals_per_vendor | qry ดูยอดซื้อร้านค้าแต่ละเจ้า | Orders | query_name |
+| shop_sales_totals | qry ยอดขายร้านค้า | Orders | query_name |
+| shop_specific_notes | หมายเหตุเฉพาะร้าน | Customers | column_name |
+| shop_tax_id | เลขประจำตัวผู้เสียภาษีร้านค้า | Customers | column_name |
+| shop_tax_invoice | ใบกำกับภาษีร้านค้า | Orders | report_name |
+| shop_tax_invoice_copy | ใบกำกับภาษีร้านค้า(สำเนา) | Orders | report_name |
+| shop_tax_invoice_duplicate | Copy of ใบกำกับภาษีร้านค้า | Orders | report_name |
+| shop_tracking_notification | ข้อมูลสำหรับแจ้งเลขพัสดุร้านค้า | Customers | report_name |
+| shop_transfer_details | qry รายละเอียดการโอนเงินร้านค้า | Financial | query_name |
+| shops_awaiting_transfer | qry_ร้านค้ารอโอน | Orders | query_name |
+| shops_ship_before_payment | qry_ร้านค้าส่งของให้ก่อน | Orders | query_name |
+| start_date | วันที่เริ่มต้น | Orders | form_label |
+| store_phone | เบอร์ร้าน | Customers | column_name |
+| sum_line_total | SumOfราคารวม | Orders | calculated_field |
+| sum_net_total_incl_vat | SumOfราคาสุทธิรวมภาษีมูลค่าเพิ่ม | Orders | calculated_field |
+| sum_points | SumOfคะแนน | Customers | calculated_field |
+| sum_pre_vat_after_bill_end_discount | SumOfราคารวมก่อนแวทหลังหักส่วนลดท้ายบิล | Orders | calculated_field |
+| sum_pre_vat_total | SumOfราคารวมก่อนแวท | Orders | calculated_field |
+| sum_quantity | SumOfจำนวน | Orders | calculated_field |
+| sum_quantity_issued | SumOfจำนวนเบิก | Inventory | calculated_field |
+| sum_quantity_received | SumOfจำนวนรับเข้า | Inventory | calculated_field |
+| sum_retail_net_total_incl_vat | SumOfราคาสุทธิปลีกรวมภาษีมูลค่าเพิ่ม | Orders | calculated_field |
+| sum_retail_vat | SumOfภาษีมูลค่าเพิ่มปลีก | Orders | calculated_field |
+| sum_total_after_bill_end_discount | SumOfราคารวมหลังหักส่วนลดท้ายบิล | Orders | calculated_field |
+| sum_total_after_shop_discount | SumOfราคารวมหลังหักส่วนลดร้านค้า | Orders | calculated_field |
+| sum_vat | SumOfภาษีมูลค่าเพิ่ม | Orders | calculated_field |
+| tax_invoice | ใบกำกับภาษี | Customers | enum_value |
+| telephone | โทรศัพท์ | Customers | enum_value |
+| total_after_bill_end_discount | ราคารวมหลังหักส่วนลดท้ายบิล | Orders | calculated_field |
+| total_after_shop_discount | ราคารวมหลังหักส่วนลดร้านค้า | Orders | calculated_field |
+| total_issued_all_products | qry จำนวนเบิกรวม ของสินค้าทุกตัว | Inventory | query_name |
+| total_points | คะแนนรวม | Customers | column_name |
+| total_pre_vat | ราคารวมก่อนแวท | Orders | calculated_field |
+| total_pre_vat_after_bill_end_discount | ราคารวมก่อนแวทหลังหักส่วนลดท้ายบิล | Orders | calculated_field |
+| total_pre_vat_after_shop_discount | ราคารวมก่อนแวทหลังหักส่วนลดร้านค้า | Orders | calculated_field |
+| total_received_all_products | qry จำนวนรับเข้ารวม ของสินค้าทุกตัว | Inventory | query_name |
+| total_sold_per_product | qry จำนวนที่ขายของสินค้าแต่ละตัว | Inventory | query_name |
+| transfer_date | วันที่โอนเงิน | Orders | column_name |
+| transfer_datetime_by_invoice | qry วันที่และเวลาโอนเงินเรียงตามใบกำกับ | Financial | query_name |
+| transfer_details | รายละเอียดการโอน | Financial | report_name |
+| transfer_details_per_order | rptรายละเอียดการโอนเงินของแต่ละเลขที่ออเดอร์ | Financial | report_name |
+| transfer_first_only | โอนเงินก่อนเท่านั้น | Customers | enum_value |
+| transfer_time | เวลาโอนเงิน | Orders | column_name |
+| unit | หน่วยนับ | Products | column_name |
+| unit_value_list | "ซอง";"ตัว";"เม็ด" | Products | query_name |
+| vat | ภาษีมูลค่าเพิ่ม | Orders | calculated_field |
+| vat_bill_asked | ถามเรื่องบิลแวทยัง | Customers | column_name |
+| view_issue_numbers | rptดูเลขทีใบเบิก | Inventory | report_name |
+| Wanpen | วันเพ็ญ | Proper Nouns | proper_noun |
+| yearly_invoice_number | เลขที่invoiceของปี | Orders | column_name |
+| yearly_receipt_number | เลขที่ใบรับเข้าของปี | Inventory | column_name |
+
+### Thai Alphabetical Index
+
+| Thai | English | Domain | Category |
+|------|---------|--------|----------|
+| "ซอง";"ตัว";"เม็ด" | unit_value_list | Products | query_name |
+| Copy of ใบกำกับภาษีร้านค้า | shop_tax_invoice_duplicate | Orders | report_name |
+| FACEBOOK | FACEBOOK | Orders | enum_value |
+| ID | ID | Inventory | column_name |
+| LINE | LINE | Orders | enum_value |
+| SumOfคะแนน | sum_points | Customers | calculated_field |
+| SumOfจำนวน | sum_quantity | Orders | calculated_field |
+| SumOfจำนวนรับเข้า | sum_quantity_received | Inventory | calculated_field |
+| SumOfจำนวนเบิก | sum_quantity_issued | Inventory | calculated_field |
+| SumOfภาษีมูลค่าเพิ่ม | sum_vat | Orders | calculated_field |
+| SumOfภาษีมูลค่าเพิ่มปลีก | sum_retail_vat | Orders | calculated_field |
+| SumOfราคารวม | sum_line_total | Orders | calculated_field |
+| SumOfราคารวมก่อนแวท | sum_pre_vat_total | Orders | calculated_field |
+| SumOfราคารวมก่อนแวทหลังหักส่วนลดท้ายบิล | sum_pre_vat_after_bill_end_discount | Orders | calculated_field |
+| SumOfราคารวมหลังหักส่วนลดท้ายบิล | sum_total_after_bill_end_discount | Orders | calculated_field |
+| SumOfราคารวมหลังหักส่วนลดร้านค้า | sum_total_after_shop_discount | Orders | calculated_field |
+| SumOfราคาสุทธิปลีกรวมภาษีมูลค่าเพิ่ม | sum_retail_net_total_incl_vat | Orders | calculated_field |
+| SumOfราคาสุทธิรวมภาษีมูลค่าเพิ่ม | sum_net_total_incl_vat | Orders | calculated_field |
+| frm รับเข้าสินค้า | goods_receipt_form | Inventory | form_name |
+| frm เบิกสินค้า | goods_issue_form | Inventory | form_name |
+| frm_salesorder_fishingshop | frm_salesorder_fishingshop | Orders | form_name |
+| frm_salesorder_retail | frm_salesorder_retail | Orders | form_name |
+| frm_stck_fishingshop | frm_stck_fishingshop | Inventory | form_name |
+| frm_สต็อคสินค้า | product_stock_form | Inventory | form_name |
+| frmข้อมูลสมาชิก | member_info_form | Customers | form_name |
+| id | id | Orders | column_name |
+| invสุดท้าย | inv_end | Orders | form_label |
+| invเริ่มต้น | inv_start | Orders | form_label |
+| pdf แจ้งยอด | balance_notification_pdf | Orders | report_name |
+| qry stck subform2 | qry stck subform2 | Inventory | form_name |
+| qry คะแนนคงเหลือหลังจากใช้แล้ว | remaining_points_after_use | Customers | query_name |
+| qry คะแนนรวมลูกค้าแต่ละคน | customer_total_points | Customers | query_name |
+| qry คะแนนรวมลูกค้าแต่ละคน subform | customer_points_subform | Customers | form_name |
+| qry จำนวนที่ขายของสินค้าแต่ละตัว | total_sold_per_product | Inventory | query_name |
+| qry จำนวนรับเข้ารวม ของสินค้าทุกตัว | total_received_all_products | Inventory | query_name |
+| qry จำนวนเบิกรวม ของสินค้าทุกตัว | total_issued_all_products | Inventory | query_name |
+| qry ดูยอดซื้อร้านค้าแต่ละเจ้า | shop_purchase_totals_per_vendor | Orders | query_name |
+| qry ที่อยู่เจาะจงโดยวันที่ (ปลีก) | retail_addresses_by_date | Customers | query_name |
+| qry ที่อยู่เจาะจงโดยวันที่ (ร้านค้า) | shop_addresses_by_date | Customers | query_name |
+| qry ยอดขายร้านค้า | shop_sales_totals | Orders | query_name |
+| qry ยอดขายลูกค้าปลีก | retail_sales_totals | Orders | query_name |
+| qry ยอดซื้อร้านค้าทั้งปี | shop_annual_purchase_totals | Orders | query_name |
+| qry รายละเอียดการโอนเงินร้านค้า | shop_transfer_details | Financial | query_name |
+| qry รายละเอียดการโอนแต่ละออเดอร์ปลีก | retail_order_transfer_details | Financial | query_name |
+| qry วันที่และเวลาโอนเงินเรียงตามใบกำกับ | transfer_datetime_by_invoice | Financial | query_name |
+| qry สต็อคสินค้า | product_stock | Inventory | query_name |
+| qry สต็อคสินค้าในแต่ละออเดอร์ปลีก | retail_order_stock | Inventory | query_name |
+| qry สินค้าในแต่ละออเดอร์ Subform | order_line_items_subform | Orders | form_name |
+| qry สินค้าในแต่ละออเดอร์ Subform1 | order_line_items_subform_1 | Orders | form_name |
+| qry สินค้าในแต่ละออเดอร์ปลีก | retail_order_line_items | Orders | query_name |
+| qry สินค้าในแต่ละออเดอร์ร้านค้า | shop_order_line_items | Orders | query_name |
+| qry สินค้าในแต่ละออเดอร์ร้านค้า subform | shop_order_line_items_subform | Orders | form_name |
+| qry เจาะจงหมายเลขออเดอร์ subreport | order_detail_subreport | Orders | report_name |
+| qry เจาะจงหมายเลขออเดอร์ปลีก | retail_order_lookup | Orders | query_name |
+| qry เจาะจงหมายเลขออเดอร์ร้านค้า | shop_order_lookup | Orders | query_name |
+| qry เจาะจงเลขที่ใบรับเข้า | receipt_lookup | Inventory | query_name |
+| qry เจาะจงเลขที่ใบเบิก | issue_lookup | Inventory | query_name |
+| qry_ร้านค้ารอโอน | shops_awaiting_transfer | Orders | query_name |
+| qry_ร้านค้าส่งของให้ก่อน | shops_ship_before_payment | Orders | query_name |
+| qry_สินค้าที่ขายดีย้อนหลัง 3 เดือน | best_sellers_last_3_months | Orders | query_name |
+| qryกำหนดเลขที่inv | assign_invoice_number | Financial | query_name |
+| qryยอดเงินร้านค้า | shop_payment_amounts | Orders | query_name |
+| qryรายงานสินค้าและวัตุดิบ | product_and_material_report | Products | query_name |
+| qryลงยอดร้านค้า | post_shop_payments | Financial | query_name |
+| qryใส่เลขที่ใบกำกับ | enter_tax_invoice_number | Financial | query_name |
+| rptดูเลขทีใบเบิก | view_issue_numbers | Inventory | report_name |
+| rptทำที่อยู่เบิกสินค้า | issue_address_labels | Inventory | report_name |
+| rptรายละเอียดการโอนเงินของแต่ละเลขที่ออเดอร์ | transfer_details_per_order | Financial | report_name |
+| กรุณาระบุรหัสร้านค้า | please_enter_shop_code | Orders | form_label |
+| กสิกร | kasikorn_bank | Orders | enum_value |
+| ขนส่งที่สะดวก | preferred_carrier | Customers | column_name |
+| ข้อมูลร้านค้า | shop_info | Customers | table_name |
+| ข้อมูลสมาชิก | member_info | Customers | table_name |
+| ข้อมูลสำหรับแจ้งเลขพัสดุร้านค้า | shop_tracking_notification | Customers | report_name |
+| ข้อมูลสำหรับแจ้งเลขพัสดุลูกค้าปลีก | retail_tracking_notification | Customers | report_name |
+| ครั้ง | per_shipment | Products | enum_value |
+| คะแนน | points | Orders | calculated_field |
+| คะแนนคงเหลือหลังจากใช้แล้ว | remaining_points_form | Customers | form_name |
+| คะแนนคีย์มือเพิ่มให้ | manual_bonus_points | Customers | column_name |
+| คะแนนคีย์เอง | manual_points_entry | Orders | column_name |
+| คะแนนที่ลูกค้าใช้ไป | customer_points_used | Customers | table_name |
+| คะแนนที่ใช้ครั้งที่ 1 | points_used_1 | Customers | column_name |
+| คะแนนที่ใช้ครั้งที่ 2 | points_used_2 | Customers | column_name |
+| คะแนนที่ใช้ครั้งที่ 3 | points_used_3 | Customers | column_name |
+| คะแนนที่ใช้ครั้งที่ 4 | points_used_4 | Customers | column_name |
+| คะแนนที่ใช้ครั้งที่ 5 | points_used_5 | Customers | column_name |
+| คะแนนที่ใช้ครั้งที่1 | points_redeemed_1 | Customers | column_name |
+| คะแนนที่ใช้ครั้งที่2 | points_redeemed_2 | Customers | column_name |
+| คะแนนที่ใช้ครั้งที่3 | points_redeemed_3 | Customers | column_name |
+| คะแนนรวม | total_points | Customers | column_name |
+| คุณต้าร์ทองเหลือง | Khun Tar Thonglueang | Proper Nouns | proper_noun |
+| จันทกานต์ | Chantakan | Proper Nouns | proper_noun |
+| จำนวน | quantity | Orders | column_name |
+| จำนวนขาย | quantity_sold | Inventory | calculated_field |
+| จำนวนที่ขายของสินค้าแต่ละตัว(ระบุวันที่) | product_sales_by_date | Orders | query_name |
+| จำนวนรับเข้า | quantity_received | Inventory | column_name |
+| จำนวนเบิก | quantity_issued | Inventory | column_name |
+| ชื่อ | first_name | Customers | column_name |
+| ชื่อร้าน | shop_name | Customers | column_name |
+| ชื่อร้านสำหรับออกใบกำกับ | invoice_shop_name | Customers | column_name |
+| ชื่อออกใบกำกับปลีก | retail_invoice_name | Customers | column_name |
+| ชื่อเฟส | facebook_name | Customers | column_name |
+| ชื่อไลน์ | line_name | Customers | column_name |
+| ชื่อไลน์หรือเฟซ | line_or_facebook_name | Customers | column_name |
+| ช่องทางติดต่อที่สะดวก | preferred_contact_channel | Customers | column_name |
+| ช่องทางสั่งซื้อ | order_channel | Orders | column_name |
+| ซอง | pack | Products | enum_value |
+| ซองใหญ่ | large_pack | Products | enum_value |
+| ดูจำนวนรวมสินค้าที่สั่งหลายออเดอร์รวมกัน | combined_multi_order_quantities | Orders | query_name |
+| ตรวจภาษีขาย | sales_tax_verification | Financial | report_name |
+| ตรวจภาษีขายเรียงตามเลขinv | sales_tax_verification_by_inv | Financial | report_name |
+| ตัว | piece | Products | enum_value |
+| ถามเรื่องบิลแวทยัง | vat_bill_asked | Customers | column_name |
+| ถามแล้ว | already_asked | Customers | enum_value |
+| ที่อยู่ | address | Customers | column_name |
+| ที่อยู่ล่าสุด | latest_address | Customers | column_name |
+| ที่อยู่สำหรับออกใบกำกับ | invoice_address | Customers | column_name |
+| ธนาคาร | bank | Orders | column_name |
+| นามสกุล | last_name | Customers | column_name |
+| บิลธรรมดา | regular_bill | Customers | enum_value |
+| บิลร้านค้า | shop_bill | Orders | report_name |
+| บิลลูกค้าปลีก | retail_customer_bill | Orders | report_name |
+| ปรินท์ใบเบิกสินค้า | print_goods_issue | Inventory | report_name |
+| ปริ้นท์ที่อยู่ | print_addresses | Customers | report_name |
+| ปริ้นท์ที่อยู่ลูกค้าปลีก | print_retail_addresses | Customers | report_name |
+| ปิดวันอาทิตย์ | closed_sunday | Customers | enum_value |
+| ผู้ผลิต หรือ พนักงานแพ็ค | producer_or_packer | Inventory | column_name |
+| พนักงานตรวจการบันทึกข้อมูล | data_entry_reviewer | Financial | column_name |
+| พนักงานตรวจเช็ค | inspection_staff | Financial | column_name |
+| พนักงานบันทึกข้อมูล | data_entry_staff | Financial | column_name |
+| พนักงานรับออเดอร์ | order_staff | Orders | column_name |
+| พนักงานเบิก | issuing_staff | Inventory | column_name |
+| ภาษีมูลค่าเพิ่ม | vat | Orders | calculated_field |
+| ภาษีมูลค่าเพิ่มปลีก | retail_vat | Orders | calculated_field |
+| รหัสร้านค้า | shop_code | Orders | column_name |
+| รหัสร้านค้าที่เบิก | issue_shop_code | Inventory | column_name |
+| รหัสร้านค้าออโต้ | shop_auto_id | Customers | column_name |
+| รหัสสินค้า | product_code | Products | column_name |
+| รอโอน | awaiting_transfer | Orders | enum_value |
+| รัตนาพร | Rattanaporn | Proper Nouns | proper_noun |
+| ราคา | price | Products | column_name |
+| ราคาก่อนแวท | pre_vat_price | Products | column_name |
+| ราคาก่อนแวทหลังหักส่วนลดร้านค้า | pre_vat_after_shop_discount | Orders | calculated_field |
+| ราคารวม | line_total | Orders | calculated_field |
+| ราคารวมก่อนแวท | total_pre_vat | Orders | calculated_field |
+| ราคารวมก่อนแวทหลังหักส่วนลดท้ายบิล | total_pre_vat_after_bill_end_discount | Orders | calculated_field |
+| ราคารวมก่อนแวทหลังหักส่วนลดร้านค้า | total_pre_vat_after_shop_discount | Orders | calculated_field |
+| ราคารวมหลังหักส่วนลดท้ายบิล | total_after_bill_end_discount | Orders | calculated_field |
+| ราคารวมหลังหักส่วนลดร้านค้า | total_after_shop_discount | Orders | calculated_field |
+| ราคาร้านค้ารวมแวท | shop_price_incl_vat | Products | column_name |
+| ราคาสุทธิปลีกรวมภาษีมูลค่าเพิ่ม | retail_net_total_incl_vat | Orders | calculated_field |
+| ราคาสุทธิรวมภาษีมูลค่าเพิ่ม | net_total_incl_vat | Orders | calculated_field |
+| ราคาหลังหักส่วนลดร้านค้า | price_after_shop_discount | Orders | calculated_field |
+| รายงานภาษีขาย | sales_tax_report | Financial | report_name |
+| รายละเอียดการโอน | transfer_details | Financial | report_name |
+| รายละเอียดออเดอร์ | order_details | Orders | table_name |
+| รายละเอียดเพิ่มเติม | additional_details | Financial | column_name |
+| รายละเอียดใบรับเข้าสินค้า | goods_receipt_details | Inventory | report_name |
+| ริปรอย | RipRoy | Proper Nouns | proper_noun |
+| ลำดับที่ | sequence_number | Products | column_name |
+| วันที่ | date | Orders | column_name |
+| วันที่inv | invoice_date | Orders | column_name |
+| วันที่จบ | date_end | Orders | form_label |
+| วันที่ต้นเดือน | month_start_date | Orders | form_label |
+| วันที่ท้ายเดือน | month_end_date | Orders | form_label |
+| วันที่รับเข้า | receipt_date | Inventory | column_name |
+| วันที่สร้างข้อมูล | record_created_date | Customers | column_name |
+| วันที่สุดท้าย | end_date | Orders | form_label |
+| วันที่เบิก | issue_date | Inventory | column_name |
+| วันที่เปิดบิลสุดท้าย | bill_end_date | Orders | form_label |
+| วันที่เปิดบิลเริ่มต้น | bill_start_date | Orders | form_label |
+| วันที่เริ่ม | date_start | Orders | form_label |
+| วันที่เริ่มต้น | start_date | Orders | form_label |
+| วันที่โอนเงิน | transfer_date | Orders | column_name |
+| วันหยุด | holidays | Customers | column_name |
+| วันเพ็ญ | Wanpen | Proper Nouns | proper_noun |
+| สด | cash_or_individual | Customers | enum_value |
+| สาขาสถานประกอบการ | business_branch | Customers | column_name |
+| สาขาสำนักงานใหญ่ | head_office_branch | Customers | column_name |
+| สินค้า | products | Products | table_name |
+| สินค้าในแต่ละออเดอร์ | order_line_items | Orders | table_name |
+| สินค้าในแต่ละใบรับเข้า | receipt_line_items | Inventory | table_name |
+| สินค้าในแต่ละใบรับเข้า Subform | receipt_line_items_subform | Inventory | form_name |
+| สินค้าในแต่ละใบเบิก | issue_line_items | Inventory | table_name |
+| สินค้าในแต่ละใบเบิก Subform | issue_line_items_subform | Inventory | form_name |
+| ส่งของก่อนหรือโอนเงินก่อน | ship_or_pay_first | Customers | column_name |
+| ส่งของให้ก่อน | ship_before_payment | Orders | enum_value |
+| ส่วนลดท้ายบิล(%) | bill_end_discount_percent | Orders | column_name |
+| ส่วนลดร้านค้า | shop_discount | Products | column_name |
+| ส่วนลดร้านค้าก่อนแวท | shop_discount_pre_vat | Products | column_name |
+| หน่วยนับ | unit | Products | column_name |
+| หน้าหลัก | main_menu | Customers | form_name |
+| หมายเลขกล่อง | box_number | Inventory | column_name |
+| หมายเลขสมาชิก | member_number | Customers | column_name |
+| หมายเลขสมาชิกที่เบิก | issue_member_number | Inventory | column_name |
+| หมายเลขออโต้ | member_auto_id | Customers | column_name |
+| หมายเหตุ | notes | Inventory | column_name |
+| หมายเหตุอื่นๆ | other_notes | Orders | column_name |
+| หมายเหตุเฉพาะร้าน | shop_specific_notes | Customers | column_name |
+| หัวใบรับเข้า | receipt_headers | Inventory | table_name |
+| หัวใบเบิก | issue_headers | Inventory | table_name |
+| หาเลขที่ออเดอร์ถ้ารู้ชื่อร้าน | order_lookup_by_shop_name | Orders | form_name |
+| อรุณี | Arunee | Proper Nouns | proper_noun |
+| อื่นๆ | other | Orders | enum_value |
+| เคอรี่และไปรษณีย์ไทย | kerry_and_thailand_post | Customers | enum_value |
+| เงินสด | cash | Orders | enum_value |
+| เบอร์ร้าน | store_phone | Customers | column_name |
+| เบอร์โทรศัพท์ | phone_number | Customers | column_name |
+| เบอร์โทรศัพท์2(มือถือ) | mobile_phone_2 | Customers | column_name |
+| เบอร์โทรศัพท์ร้านค้า | shop_phone | Customers | column_name |
+| เปิดทุกวัน | open_every_day | Customers | enum_value |
+| เฟซบุค แมสเซนเจอร์ | facebook_messenger | Customers | column_name |
+| เม็ด | bead | Products | enum_value |
+| เลขที่invoiceของปี | yearly_invoice_number | Orders | column_name |
+| เลขที่invoiceของแต่ละเดือน | monthly_invoice_number | Orders | column_name |
+| เลขที่ออเดอร์ | order_number | Orders | column_name |
+| เลขที่ออเดอร์สุดท้าย | last_order_number | Orders | form_label |
+| เลขที่ออเดอร์แรก | first_order_number | Orders | form_label |
+| เลขที่ใบรับเข้า | receipt_number | Inventory | column_name |
+| เลขที่ใบรับเข้าของปี | yearly_receipt_number | Inventory | column_name |
+| เลขที่ใบรับเข้าของแต่ละเดือน | monthly_receipt_number | Inventory | column_name |
+| เลขที่ใบสำคัญ | document_number | Inventory | calculated_field |
+| เลขที่ใบเบิก | issue_number | Inventory | column_name |
+| เลขประจำตัวผู้เสียภาษีปลีก | retail_tax_id | Customers | column_name |
+| เลขประจำตัวผู้เสียภาษีร้านค้า | shop_tax_id | Customers | column_name |
+| เวลาโอนเงิน | transfer_time | Orders | column_name |
+| เหตุผลการเบิก | issue_reason | Inventory | column_name |
+| เอาบิลอะไร | bill_type_preference | Customers | column_name |
+| โทรศัพท์ | telephone | Customers | enum_value |
+| โอนเงินก่อนเท่านั้น | transfer_first_only | Customers | enum_value |
+| ใบกำกับภาษี | tax_invoice | Customers | enum_value |
+| ใบกำกับภาษีร้านค้า | shop_tax_invoice | Orders | report_name |
+| ใบกำกับภาษีร้านค้า(สำเนา) | shop_tax_invoice_copy | Orders | report_name |
+| ใบกำกับภาษีลูกค้าปลีก | retail_tax_invoice | Orders | report_name |
+| ใบกำกับภาษีลูกค้าปลีก(สำเนา) | retail_tax_invoice_copy | Orders | report_name |
+| ใบจัดสินค้าร้านค้า | shop_packing_list | Orders | report_name |
+| ใบตรวจบิลร้านค้า | shop_bill_verification | Orders | report_name |
+| ใบส่งของร้านค้า | shop_delivery_note | Orders | report_name |
+| ใส่เลขที่ออเดอร์คนสุดท้ายที่จะดู | enter_last_order_to_view | Customers | form_label |
+| ใส่เลขที่ออเดอร์คนแรกที่จะดู | enter_first_order_to_view | Customers | form_label |
+| ใส่เลขที่ออเดอร์ร้านสุดท้าย | enter_last_shop_order | Customers | form_label |
+| ใส่เลขที่ออเดอร์ร้านแรก | enter_first_shop_order | Customers | form_label |
+| ได้สติกเกอร์หรือยัง | received_sticker | Customers | column_name |
+| ได้สติกเกอร์ใหญ่แล้ว | received_large_sticker | Customers | column_name |
+
+**Total unique terms: 244**
