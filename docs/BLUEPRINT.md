@@ -5,7 +5,71 @@
 
 ## Table of Contents
 
-[Placeholder -- will be finalized in Plan 03]
+- [Executive Summary](#executive-summary)
+- [Buddhist Era (BE) Date Convention](#buddhist-era-be-date-convention)
+- [Thai-English Glossary](#thai-english-glossary)
+  - [By Business Domain](#by-business-domain)
+  - [English Alphabetical Index](#english-alphabetical-index)
+  - [Thai Alphabetical Index](#thai-alphabetical-index)
+- [Data Model](#data-model)
+  - [High-Level Entity-Relationship Diagram](#high-level-entity-relationship-diagram)
+  - [Products Domain ER Detail](#products-domain-er-detail)
+  - [Orders Domain ER Detail](#orders-domain-er-detail)
+  - [Inventory Domain ER Detail](#inventory-domain-er-detail)
+  - [Customers Domain ER Detail](#customers-domain-er-detail)
+  - [Relationship Details Table](#relationship-details-table)
+- [Products Domain](#products-domain)
+  - [Tables](#tables)
+  - [Queries](#queries)
+  - [Forms](#forms)
+  - [Reports](#reports)
+  - [Named Workflows](#named-workflows)
+- [Orders Domain](#orders-domain)
+  - [Tables](#tables-1)
+  - [Queries](#queries-1)
+  - [Forms](#forms-1)
+  - [Reports](#reports-1)
+  - [Named Workflows](#named-workflows-1)
+- [Inventory Domain](#inventory-domain)
+  - [Tables](#tables-2)
+  - [Queries](#queries-2)
+  - [Forms](#forms-2)
+  - [Reports](#reports-2)
+  - [Named Workflows](#named-workflows-2)
+- [Customers Domain](#customers-domain)
+  - [Tables](#tables-3)
+  - [Queries](#queries-3)
+  - [Forms](#forms-3)
+  - [Reports](#reports-3)
+  - [Named Workflows](#named-workflows-3)
+- [Financial Domain](#financial-domain)
+  - [Tables](#tables-4)
+  - [Queries](#queries-4)
+  - [Forms](#forms-4)
+  - [Reports](#reports-4)
+  - [Named Workflows](#named-workflows-4)
+- [Cross-Reference Maps](#cross-reference-maps)
+  - [Component Connection Diagram](#component-connection-diagram)
+  - [Table-to-Query Matrix](#table-to-query-matrix)
+  - [Query-to-Form Matrix](#query-to-form-matrix)
+  - [Query-to-Report Matrix](#query-to-report-matrix)
+  - [Form-to-Report Matrix](#form-to-report-matrix)
+- [Risks, Anti-Patterns, and Improvement Opportunities](#risks-anti-patterns-and-improvement-opportunities)
+  - [Data Integrity Risks](#data-integrity-risks)
+  - [Structural Anti-Patterns](#structural-anti-patterns)
+  - [Missing Features / Gaps](#missing-features--gaps)
+  - [Improvement Opportunities for Rebuild](#improvement-opportunities-for-rebuild)
+- [Rebuild Assessment](#rebuild-assessment)
+  - [Technology Recommendations](#technology-recommendations)
+  - [Per-Component Effort Estimates](#per-component-effort-estimates)
+  - [Phased Rebuild Plan](#phased-rebuild-plan)
+  - [Total Effort Summary](#total-effort-summary)
+- [Component-Type Index](#component-type-index)
+  - [All Tables](#all-tables)
+  - [All Queries (User)](#all-queries-user)
+  - [All Queries (System/Hidden)](#all-queries-systemhidden)
+  - [All Forms](#all-forms)
+  - [All Reports](#all-reports)
 
 ## Executive Summary
 
@@ -2972,3 +3036,10 @@ Quick-lookup appendix organized by component type.
 | sales_tax_verification_by_inv | ตรวจภาษีขายเรียงตามเลขinv | Financial | Exported (record source exported as ~sq_r) | [Financial Domain > Reports](#financial-domain) |
 | transfer_details | รายละเอียดการโอน | Financial | Not exported | [Financial Domain > Reports](#financial-domain) |
 | transfer_details_per_order | rptรายละเอียดการโอนเงินของแต่ละเลขที่ออเดอร์ | Financial | Exported | [Financial Domain > Reports](#financial-domain) |
+
+---
+
+*Generated: 2026-02-16*
+*Source: epic_db.accdb (~10MB, Access 2007+ format)*
+*Assessment tool: access_parser_c + Jackcess 4.0.8 + Access COM (Windows)*
+*Total database objects: 84 (10 tables, 33 user queries, 29 system queries, 7 forms exported, 4 forms corrupt, 11 reports exported)*
