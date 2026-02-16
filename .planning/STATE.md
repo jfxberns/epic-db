@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 
 ## Current Position
 
-Phase: 3 of 4 (Logic and Interface Extraction)
-Plan: 2 of 3 in current phase (03-02 complete)
-Status: 03-02 complete, ready for 03-03
-Last activity: 2026-02-15 -- Completed 03-02 (Windows Export Scripts & Access COM Extraction)
+Phase: 3 of 4 (Logic and Interface Extraction) -- COMPLETE
+Plan: 3 of 3 in current phase (03-03 complete)
+Status: Phase 03 complete, ready for Phase 04
+Last activity: 2026-02-16 -- Completed 03-03 (Form/Report Parsing & Business Logic Assessment)
 
-Progress: [██████░░░░] 60%
+Progress: [███████░░░] 75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: ~6 min (excluding human-action plans)
-- Total execution time: ~0.5 hours (automated only)
+- Total plans completed: 7
+- Average duration: ~7 min (excluding human-action plans)
+- Total execution time: ~0.6 hours (automated only)
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [██████░░░░] 60%
 |-------|-------|-------|----------|
 | 01-setup-and-validation | 2/2 | ~18 min | ~9 min |
 | 02-schema-foundation | 2/2 | ~7 min | ~3.5 min |
-| 03-logic-and-interface-extraction | 2/3 | ~6 min + ~2 days | ~6 min (auto) |
+| 03-logic-and-interface-extraction | 3/3 | ~22 min + ~2 days | ~7 min (auto) |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (~5 min), 02-02 (~2 min), 03-01 (~6 min), 03-02 (~5 min auto + ~2 days human)
-- Trend: Consistent (~4 min avg for automated tasks)
+- Last 5 plans: 02-01 (~5 min), 02-02 (~2 min), 03-01 (~6 min), 03-02 (~5 min auto + ~2 days human), 03-03 (~16 min)
+- Trend: Consistent (~6 min avg for automated tasks)
 
 *Updated after each plan completion*
 
@@ -70,6 +70,12 @@ Recent decisions affecting current work:
 - [03-02]: Only 11/25 reports exported -- remaining 14 not present (MSysObjects inventory overcounted with system references)
 - [03-02]: 29 hidden subqueries exported (vs 8 estimated) -- all ~sq_c, ~sq_d, ~sq_r types captured
 - [03-02]: Corrupt VBA forms are unrecoverable without database repair; partial data available via their subquery SQL files
+- [03-03]: Recursive descent parser for SaveAsText BEGIN/END blocks -- regex insufficient for nested structure
+- [03-03]: Binary data blocks (Property = Begin...End) require skip detection, not recursive parsing
+- [03-03]: All business logic is in query SQL calculated columns -- zero VBA code-behind in any exported component
+- [03-03]: 11 distinct pricing/calculation formulas identified: shop 2-tier discount, retail pricing, VAT 7%, loyalty points, stock formula
+- [03-03]: Stock is calculated (received - sold - issued), never stored as a balance
+- [03-03]: Points system limited to 3 lifetime redemptions (fixed columns, not transaction log)
 
 ### Pending Todos
 
@@ -84,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-15
-Stopped at: Completed 03-02-PLAN.md -- Windows export scripts and Access COM extraction
-Resume file: .planning/phases/03-logic-and-interface-extraction/03-02-SUMMARY.md
+Last session: 2026-02-16
+Stopped at: Completed 03-03-PLAN.md -- Form/Report Parsing & Business Logic Assessment (Phase 03 complete)
+Resume file: .planning/phases/03-logic-and-interface-extraction/03-03-SUMMARY.md
