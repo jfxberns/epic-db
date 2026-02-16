@@ -2460,6 +2460,376 @@ There is no built-in backup, data export, or disaster recovery capability beyond
 
 ---
 
+## Rebuild Assessment
+
+This section translates the technical documentation above into actionable planning guidance: what technology to use, how long each component takes to rebuild, and what order to build in.
+
+### Technology Recommendations
+
+The rebuild replaces a single-file Microsoft Access 2010 database serving 1-3 users with 10-50 orders/day. The business is a small fishing tackle manufacturer/distributor in Thailand requiring bilingual Thai+English UI. All current business logic is in SQL queries (zero VBA), and the UI consists of simple forms and reports with no complex interactions.
+
+#### Option A: Next.js + PostgreSQL (Recommended)
+
+| Aspect | Detail |
+|---|---|
+| **Frontend** | Next.js (React) with App Router |
+| **Backend** | Next.js API Routes (server-side) |
+| **Database** | PostgreSQL 16 |
+| **ORM** | Prisma |
+| **Hosting** | Vercel (frontend) + Railway or Supabase (database) |
+| **i18n** | next-intl or next-i18next (mature Thai locale support) |
+
+**Why it fits:**
+- React's component model maps directly to the form-based UI (each Access form becomes a React component)
+- Next.js API routes replace Access queries as the business logic layer -- all 11 pricing formulas translate directly to server-side TypeScript functions or Prisma computed fields
+- PostgreSQL supports Thai collation natively (th_TH locale) for proper sorting and searching
+- Prisma schema maps 1:1 to the 10-table structure documented in the Data Model section
+- next-intl provides built-in Thai+English translation with namespace-based organization that maps to the glossary domains
+- Vercel free tier handles the traffic volume (10-50 orders/day is well within limits)
+
+**Complexity:** Medium (for a solo developer with JavaScript experience)
+
+**Estimated monthly cost:** $0-20/month (Vercel free tier + Railway starter at $5/month for PostgreSQL)
+
+**Key tradeoffs:**
+- Requires JavaScript/TypeScript knowledge
+- More setup overhead than a low-code solution
+- Full control over UI and business logic
+- Excellent ecosystem for future features (payments, notifications, PDF generation)
+
+#### Option B: Laravel + MySQL
+
+| Aspect | Detail |
+|---|---|
+| **Frontend** | Blade templates + Livewire (or Inertia.js + Vue) |
+| **Backend** | Laravel 11 (PHP) |
+| **Database** | MySQL 8 |
+| **ORM** | Eloquent |
+| **Hosting** | Shared hosting (Hostinger/A2) or Laravel Forge + DigitalOcean |
+| **i18n** | Laravel built-in localization (lang/th, lang/en directories) |
+
+**Why it fits:**
+- Laravel's form request validation and Eloquent relationships closely mirror Access form/table bindings
+- Built-in localization with JSON translation files maps directly to the glossary
+- Blade templates are simpler than React for basic form+report UI patterns
+- MySQL is widely available on Thai hosting providers
+- Lower barrier for PHP developers (more common in the Thai dev market)
+
+**Complexity:** Low-Medium (PHP is simpler for CRUD applications)
+
+**Estimated monthly cost:** $5-15/month (shared hosting with MySQL included)
+
+**Key tradeoffs:**
+- Less modern frontend experience compared to React
+- Server-rendered pages (slower transitions, but simpler architecture)
+- PHP ecosystem is mature but declining in new adoption
+- Excellent for rapid CRUD development (the core of this system)
+
+#### Option C: Budibase / Appsmith (Low-Code)
+
+| Aspect | Detail |
+|---|---|
+| **Frontend** | Visual drag-and-drop form builder |
+| **Backend** | Built-in API layer with custom JS |
+| **Database** | PostgreSQL (external) or built-in |
+| **ORM** | Auto-generated from schema |
+| **Hosting** | Self-hosted (Docker) or cloud plan |
+| **i18n** | Manual (custom label overrides per component) |
+
+**Why it fits:**
+- Closest conceptual match to Access -- visual form builder, table views, report templates
+- Can connect to PostgreSQL and auto-generate CRUD interfaces from the schema
+- Custom JavaScript functions can implement the 11 pricing formulas
+- Fastest time-to-working-prototype
+
+**Complexity:** Low (drag-and-drop, minimal coding)
+
+**Estimated monthly cost:** $0-50/month (self-hosted free, cloud plans $25-50/month)
+
+**Key tradeoffs:**
+- Limited bilingual support -- Thai UI requires manual label management per form
+- Custom business logic (pricing formulas, stock calculation) harder to implement and test
+- Vendor lock-in -- migrating away from low-code is expensive
+- Report generation (bills, tax invoices) may require external PDF library
+- Less control over UI layout and behavior
+
+#### Recommendation: Option A (Next.js + PostgreSQL)
+
+**Rationale:**
+
+1. **Bilingual requirement is first-class:** next-intl provides structured Thai+English translation that maps directly to the 244-term glossary. Options B and C can do i18n but with more manual effort.
+2. **Business logic translates cleanly:** The 11 SQL pricing formulas become TypeScript functions with type safety. PostgreSQL's SQL dialect is closest to the Access SQL already documented.
+3. **Report generation:** Libraries like @react-pdf/renderer or puppeteer can generate the bills, tax invoices, and shipping labels that are critical to daily operations.
+4. **Future-proof:** If the business grows (more users, online ordering, inventory APIs), a Next.js + PostgreSQL stack scales without re-architecture.
+5. **Cost-effective:** Free tier hosting covers the current scale. PostgreSQL on Railway or Supabase is $5-7/month.
+
+The key risk is developer availability -- Option B (Laravel) may be easier to hire for in Thailand. If the team is more comfortable with PHP, Option B is a strong second choice with minimal capability difference for this use case.
+
+### Per-Component Effort Estimates
+
+Estimates assume a **solo developer** experienced in the chosen stack, building from this blueprint. T-shirt sizes per locked decision:
+
+- **S** = 2-4 hours
+- **M** = 4-8 hours (half day to full day)
+- **L** = 1-2 days
+- **XL** = 3-5 days
+
+#### Database Schema
+
+| Component | Type | Domain | Size | Hours | Notes |
+|---|---|---|---|---|---|
+| products table + indexes | Table | Products | S | 2-4h | Single table, add numeric surrogate PK |
+| order_details table + indexes | Table | Orders | S | 2-4h | 16 columns, add channel_type enum |
+| order_line_items table + indexes | Table | Orders | S | 2-4h | Simple junction table, 4 columns |
+| receipt_headers table + indexes | Table | Inventory | S | 2-4h | 9 columns, standard header |
+| receipt_line_items table + indexes | Table | Inventory | S | 2-4h | 5 columns, standard line items |
+| issue_headers table + indexes | Table | Inventory | S | 2-4h | 10 columns, standard header |
+| issue_line_items table + indexes | Table | Inventory | S | 2-4h | 5 columns, standard line items |
+| shop_info table + indexes | Table | Customers | M | 4-8h | 25 columns, normalize contact fields |
+| member_info table + indexes | Table | Customers | S | 2-4h | 16 columns, add numeric PK |
+| FK constraints + relationships | Schema | All | M | 4-8h | 8 table-to-table FKs with proper integrity |
+| Database sequences (invoice numbers) | Schema | Financial | S | 2-4h | Replace query-based counter |
+| Audit columns (created_at, updated_at, etc.) | Schema | All | S | 2-4h | Add to all tables via migration |
+| Seed data + enum lookup tables | Schema | All | M | 4-8h | Payment status, order channel, unit types |
+
+**Schema subtotal:** 4 M + 9 S = 34-60 hours (4-8 days)
+
+#### API / Backend Endpoints
+
+| Component | Type | Domain | Size | Hours | Notes |
+|---|---|---|---|---|---|
+| Products CRUD | API | Products | S | 2-4h | Simple single-table CRUD |
+| Order details CRUD | API | Orders | M | 4-8h | Dual-channel logic, FK validation |
+| Order line items CRUD | API | Orders | M | 4-8h | Nested create/update with order |
+| Shop pricing calculation | API | Orders | L | 1-2d | 2-tier discount chain (F-01 through F-05), 8 calculated fields |
+| Retail pricing + points calculation | API | Orders | L | 1-2d | Pricing (F-06 through F-09) + points accumulation |
+| Receipt headers + line items CRUD | API | Inventory | M | 4-8h | Header/line item pattern |
+| Issue headers + line items CRUD | API | Inventory | M | 4-8h | Header/line item pattern |
+| Stock calculation query | API | Inventory | M | 4-8h | Received - Sold - Issued formula, consider stored balance |
+| Shop info CRUD | API | Customers | S | 2-4h | Standard CRUD, many fields |
+| Member info CRUD | API | Customers | S | 2-4h | Standard CRUD |
+| Loyalty points system | API | Customers | L | 1-2d | Replace 3-slot pattern with transaction log |
+| Payment status tracking | API | Financial | M | 4-8h | Status enum, state transitions, transfer recording |
+| Invoice number management | API | Financial | M | 4-8h | Sequence-based assignment, tax invoice workflow |
+| Sales reporting queries | API | Financial | M | 4-8h | Sales totals, best sellers, purchase totals per vendor |
+| User authentication + RBAC | API | Infrastructure | XL | 3-5d | New -- not in original system |
+
+**API subtotal:** 1 XL + 3 L + 8 M + 3 S = 54-104 hours (7-13 days)
+
+#### Forms / UI Screens
+
+| Component | Type | Domain | Size | Hours | Notes |
+|---|---|---|---|---|---|
+| Product list / edit screen | UI | Products | S | 2-4h | Simple data table + edit form |
+| Shop order entry form | UI | Orders | XL | 3-5d | Rebuild from corrupt form inference; header + line items + stock display + pricing preview + print triggers |
+| Retail order entry form | UI | Orders | XL | 3-5d | Rebuild from corrupt form inference; header + line items + stock + points display |
+| Order lookup form | UI | Orders | S | 2-4h | Search by shop name, order number |
+| Goods receipt form + subform | UI | Inventory | L | 1-2d | Header + line items with product lookup |
+| Goods issue form + subform | UI | Inventory | L | 1-2d | Header + line items with product lookup |
+| Stock display form | UI | Inventory | M | 4-8h | Real-time stock calculation display |
+| Shop customer list / edit | UI | Customers | M | 4-8h | 25 fields, contact detail management |
+| Member list / edit | UI | Customers | M | 4-8h | 16 fields, points display integration |
+| Remaining points lookup | UI | Customers | S | 2-4h | Read-only points balance display |
+| Payment tracking dashboard | UI | Financial | L | 1-2d | Awaiting transfer, ship-before-payment lists |
+| Invoice assignment screen | UI | Financial | M | 4-8h | Invoice number management interface |
+| Main menu / navigation | UI | Infrastructure | M | 4-8h | Application navigation structure |
+| Login / user management | UI | Infrastructure | L | 1-2d | New -- auth screens |
+
+**UI subtotal:** 2 XL + 4 L + 5 M + 3 S = 50-96 hours (6-12 days)
+
+#### Reports (PDF Generation)
+
+| Component | Type | Domain | Size | Hours | Notes |
+|---|---|---|---|---|---|
+| Shop bill (บิลร้านค้า) | Report | Orders | L | 1-2d | Line items + pricing + shop info; layout from report controls |
+| Retail customer bill (บิลลูกค้าปลีก) | Report | Orders | L | 1-2d | Line items + pricing + member info + points |
+| Shop tax invoice (+ copy + duplicate) | Report | Orders | L | 1-2d | Legal format with tax ID, VAT breakdown; 3 variants share template |
+| Retail tax invoice (+ copy) | Report | Orders | M | 4-8h | Similar to shop but retail pricing; 2 variants |
+| Shop delivery note | Report | Orders | M | 4-8h | Packing list variant with product details |
+| Balance notification PDF | Report | Orders | M | 4-8h | Balance summary per order |
+| Shop packing list + bill verification | Report | Orders | M | 4-8h | Internal operational documents |
+| Goods receipt detail report | Report | Inventory | M | 4-8h | Receipt header + line items |
+| Goods issue print + issue number report | Report | Inventory | M | 4-8h | Issue details + issue number listing |
+| Issue address labels | Report | Inventory | S | 2-4h | Shipping label format |
+| Tracking notifications (shop + retail) | Report | Customers | M | 4-8h | Parcel tracking number notification |
+| Address label prints (retail) | Report | Customers | S | 2-4h | Customer address labels |
+| Sales tax report | Report | Financial | L | 1-2d | Dual-channel tax summary with VAT breakdown |
+| Sales tax verification (by invoice) | Report | Financial | M | 4-8h | Verification document sorted by invoice number |
+| Transfer details per order | Report | Financial | S | 2-4h | Simple transfer date/time listing |
+| Report template framework | Report | Infrastructure | L | 1-2d | Shared PDF template with Thai+English headers, company branding |
+
+**Reports subtotal:** 5 L + 8 M + 3 S = 50-92 hours (6-12 days)
+
+#### Infrastructure
+
+| Component | Type | Domain | Size | Hours | Notes |
+|---|---|---|---|---|---|
+| Bilingual i18n setup | Infra | All | L | 1-2d | Thai+English using 244-term glossary from this blueprint |
+| Database migration framework | Infra | All | S | 2-4h | Prisma migrations or Laravel migrations |
+| Data migration from Access | Infra | All | XL | 3-5d | Export 10 tables (~30K rows), transform Thai text PKs to numeric, map relationships |
+| API validation + error handling | Infra | All | M | 4-8h | Input validation, error responses, Thai error messages |
+| Backup + disaster recovery | Infra | All | S | 2-4h | Automated database backups |
+| Deployment + CI/CD | Infra | All | M | 4-8h | Production deployment pipeline |
+| Thai date (BE) display support | Infra | All | S | 2-4h | CE storage + BE display formatting |
+
+**Infrastructure subtotal:** 1 XL + 1 L + 2 M + 3 S = 26-50 hours (3-6 days)
+
+### Phased Rebuild Plan
+
+#### Phase 1: Foundation (Estimated: 3-5 days)
+
+**What to build:**
+- Database schema for all 10 tables with proper FK constraints and audit columns
+- Enum/lookup tables (payment status, order channel, unit types)
+- User authentication with role-based access (admin, order_entry, inventory, reporting)
+- Bilingual i18n framework with Thai+English translation files seeded from the glossary
+- BE date display support
+- Migration framework and deployment pipeline
+
+**Why first:** Everything depends on the schema, auth, and i18n framework. No feature can be built until these exist.
+
+**Components:** Database schema (34-60h subset covering table creation + FK + audit + seeds), auth (3-5d), i18n setup (1-2d), date support (2-4h), deployment (4-8h)
+
+**Effort:** 46-82 hours
+
+#### Phase 2: Core Data (Estimated: 2-3 days)
+
+**What to build:**
+- Products CRUD (list, create, edit, search)
+- Shop customer (shop_info) CRUD with 25 fields
+- Retail member (member_info) CRUD with 16 fields
+- Customer merge/dedup capability (improvement opportunity from dual-table pattern)
+
+**Why second:** Master data (products, customers) must exist before any transactions can reference them. These are simple CRUD screens with no complex business logic.
+
+**Components:** Products API + UI (S+S = 4-8h), Shop info API + UI (S+M = 6-12h), Member info API + UI (S+M = 6-12h)
+
+**Effort:** 16-32 hours
+
+#### Phase 3: Order Management (Estimated: 6-10 days)
+
+**What to build:**
+- Shop order entry form (rebuilt from corrupt form inference -- highest complexity component)
+- Retail order entry form (rebuilt from corrupt form inference)
+- Shop 2-tier pricing calculation (F-01 through F-05)
+- Retail pricing with loyalty points (F-06 through F-09)
+- Order lookup, sales totals, best sellers, and purchase summary queries
+- Order-related reports: shop bill, retail bill, delivery note, packing list, balance notification
+
+**Why third:** This is the core business workflow -- the daily operation that generates revenue. Depends on Phase 2 master data.
+
+**Components:** Shop order form (XL = 3-5d), Retail order form (XL = 3-5d), Pricing APIs (L+L = 2-4d), Order API (M+M = 1-2d), Sales queries API (M = 4-8h), 7 order reports (3L+4M = 19-38h)
+
+**Effort:** 68-128 hours
+
+#### Phase 4: Inventory (Estimated: 3-5 days)
+
+**What to build:**
+- Goods receipt form with header + line items
+- Goods issue form with header + line items
+- Stock calculation (Received - Sold - Issued) with optional stored balance
+- Stock display form with real-time levels
+- Inventory reports: receipt details, issue print, issue numbers, address labels
+
+**Why fourth:** Inventory management depends on products (Phase 2) and feeds into order stock display (Phase 3 can show stock after Phase 4 is complete, or show placeholder until then).
+
+**Components:** Receipt form (L = 1-2d), Issue form (L = 1-2d), Stock calculation API (M = 4-8h), Stock display UI (M = 4-8h), Receipt/Issue APIs (M+M = 1-2d), 4 inventory reports (M+M+M+S = 14-28h)
+
+**Effort:** 34-66 hours
+
+#### Phase 5: Financial + Reporting (Estimated: 3-5 days)
+
+**What to build:**
+- Payment tracking dashboard (awaiting transfer, ship before payment, posted payments)
+- Invoice number management (sequential assignment with database sequences)
+- Tax invoice generation (shop original/copy/duplicate, retail original/copy)
+- Sales tax reports and verification documents
+- Loyalty points system rebuild (transaction log replacing 3-column pattern)
+- Points lookup and display integration
+
+**Why fifth:** Financial reporting and tax invoicing consume data from all other domains. The loyalty points rebuild is best done here when the order flow is already working and generating points data.
+
+**Components:** Payment dashboard (L = 1-2d), Invoice management (M+M = 1-2d), Tax invoices (L+M = 1.5-3d), Sales tax reports (L+M = 1.5-3d), Points system API (L = 1-2d), Points UI (S+S = 4-8h), Transfer reports (M+S = 6-12h)
+
+**Effort:** 46-86 hours
+
+#### Phase 6: Data Migration, Testing, and Polish (Estimated: 5-8 days)
+
+**What to build:**
+- Data migration from Access: export all 10 tables, transform text PKs to numeric surrogates, map relationships, validate bilingual data
+- Integration testing: all 8 named workflows end-to-end
+- Report layout refinement: match existing bill/invoice formats as closely as possible
+- Main menu / navigation finalization
+- User acceptance testing with business users
+- Production deployment and DNS setup
+- Backup verification
+
+**Why last:** Migration requires all target tables and business logic to exist. Testing validates the complete system. Polish ensures the rebuild matches business expectations.
+
+**Components:** Data migration (XL = 3-5d), Integration testing (L = 1-2d), Report polish (L = 1-2d), Navigation (M = 4-8h), UAT support (L = 1-2d), Production deploy (M = 4-8h)
+
+**Effort:** 42-74 hours
+
+### Total Effort Summary
+
+#### By Domain
+
+| Domain | Schema | API | UI | Reports | Infra | Total Hours | Total Days |
+|---|---|---|---|---|---|---|---|
+| Products | 2-4h | 2-4h | 2-4h | -- | -- | 6-12h | 1-1.5d |
+| Orders | 4-8h | 14-28h | 22-42h | 29-54h | -- | 69-132h | 9-17d |
+| Inventory | 8-16h | 8-16h | 10-18h | 10-20h | -- | 36-70h | 5-9d |
+| Customers | 6-12h | 6-12h | 10-18h | 6-12h | -- | 28-54h | 4-7d |
+| Financial | 2-4h | 12-24h | 6-12h | 12-24h | -- | 32-64h | 4-8d |
+| Infrastructure | 8-16h | 12-20h | 4-8h | 8-16h | 26-50h | 58-110h | 7-14d |
+| **Total** | **30-60h** | **54-104h** | **54-102h** | **65-126h** | **26-50h** | **229-442h** | **29-55d** |
+
+#### By Component Type
+
+| Component Type | Count | S | M | L | XL | Total Hours |
+|---|---|---|---|---|---|---|
+| Database Schema | 13 | 9 | 4 | -- | -- | 34-60h |
+| API / Backend | 15 | 3 | 8 | 3 | 1 | 54-104h |
+| Forms / UI | 14 | 3 | 5 | 4 | 2 | 50-96h |
+| Reports (PDF) | 16 | 3 | 8 | 5 | -- | 50-92h |
+| Infrastructure | 7 | 3 | 2 | 1 | 1 | 26-50h |
+| **Total** | **65** | **21** | **27** | **13** | **4** | **214-402h** |
+
+#### Grand Total
+
+| Metric | Optimistic | Realistic | Pessimistic |
+|---|---|---|---|
+| **Total hours** | 214h | 308h | 442h |
+| **Person-weeks** (40h/week) | 5.4 weeks | 7.7 weeks | 11.1 weeks |
+| **Person-months** (160h/month) | 1.3 months | 1.9 months | 2.8 months |
+| **Calendar time** (solo developer, 80% productivity) | 7 weeks | 10 weeks | 14 weeks |
+
+> **Note:** The "realistic" estimate is the midpoint of each range. Calendar time assumes a solo developer working full-time with 80% coding productivity (accounting for meetings, debugging, research, etc.).
+
+#### Key Risks That Could Increase Estimates
+
+| Risk | Impact | Likelihood | Mitigation |
+|---|---|---|---|
+| Corrupt form reconstruction requires iterative user feedback | +2-4 weeks on order forms | Medium | Use HIGH-confidence inference from subquery SQL; validate early with users |
+| Data migration complexity (text PKs, Thai encoding, orphaned records) | +1-2 weeks | Medium | Build migration script early; run test migrations against copy of data |
+| Bilingual UI polish (Thai text wrapping, font rendering, label lengths) | +1-2 weeks | Medium | Use i18n framework from Phase 1; test Thai rendering on target devices early |
+| Report format matching (bills, tax invoices must match current layout) | +1-2 weeks | Low | Use exported report structure as reference; accept minor layout differences |
+| Thai legal compliance for tax invoices | +1 week | Low | Validate invoice format requirements with accountant before building |
+
+#### Estimate Confidence Levels
+
+| Category | Confidence | Reasoning |
+|---|---|---|
+| Database schema | HIGH | All 10 tables fully documented with column types, relationships, and constraints |
+| API / backend endpoints | HIGH | All 33 user queries documented with SQL and business logic; 11 formulas specified |
+| UI forms (non-corrupt) | HIGH | 7 exported forms have full control lists and data bindings |
+| UI forms (corrupt -- order entry) | MEDIUM | Both order forms inferred at HIGH level from subqueries and reports, but exact layout unknown |
+| Reports | MEDIUM | 11 of 25 reports exported with controls; remaining inferred from ~sq_r subqueries |
+| Data migration | LOW | Dependent on Access export tools, Thai encoding handling, and data quality (orphaned records unknown) |
+| Infrastructure (auth, i18n, deploy) | HIGH | Standard patterns with well-known effort ranges |
+
+---
+
 ## Component-Type Index
 
 Quick-lookup appendix organized by component type.
