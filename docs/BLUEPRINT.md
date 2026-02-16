@@ -842,3 +842,1353 @@ This glossary is the single source of truth for all Thai-to-English translations
 | ได้สติกเกอร์ใหญ่แล้ว | received_large_sticker | Customers | column_name |
 
 **Total unique terms: 244**
+
+---
+
+## Data Model
+
+### High-Level Entity-Relationship Diagram
+
+All 10 tables with their foreign key relationships. English translated names used throughout; Thai originals shown in parentheses on first reference.
+
+```mermaid
+erDiagram
+    products["products (สินค้า)"] {
+        string product_name PK
+    }
+    order_details["order_details (รายละเอียดออเดอร์)"] {
+        int order_number PK
+    }
+    order_line_items["order_line_items (สินค้าในแต่ละออเดอร์)"] {
+        int id PK
+    }
+    receipt_headers["receipt_headers (หัวใบรับเข้า)"] {
+        int receipt_number PK
+    }
+    receipt_line_items["receipt_line_items (สินค้าในแต่ละใบรับเข้า)"] {
+        int ID PK
+    }
+    issue_headers["issue_headers (หัวใบเบิก)"] {
+        int issue_number PK
+    }
+    issue_line_items["issue_line_items (สินค้าในแต่ละใบเบิก)"] {
+        int ID PK
+    }
+    shop_info["shop_info (ข้อมูลร้านค้า)"] {
+        string shop_code PK
+    }
+    member_info["member_info (ข้อมูลสมาชิก)"] {
+        string phone_number PK
+    }
+    customer_points_used["customer_points_used (คะแนนที่ลูกค้าใช้ไป)"] {
+        int member_number PK
+    }
+
+    shop_info ||--o{ order_details : "shop_code"
+    member_info ||--o{ order_details : "phone_number"
+    order_details ||--o{ order_line_items : "order_number"
+    products ||--o{ order_line_items : "product_name"
+    products ||--o{ receipt_line_items : "product_name"
+    products ||--o{ issue_line_items : "product_name"
+    receipt_headers ||--o{ receipt_line_items : "receipt_number"
+    issue_headers ||--o{ issue_line_items : "issue_number"
+```
+
+> **Note:** `customer_points_used` has no relationships (abandoned table, 0 rows). The 4 table-to-query relationships (to `product_stock`, `remaining_points_after_use`, `total_sold_per_product`, `customer_total_points`) and 2 system relationships (MSysNavPane) are omitted from this diagram as they represent query-level dependencies, not table-to-table foreign keys.
+
+### Products Domain ER Detail
+
+```mermaid
+erDiagram
+    products["products (สินค้า)"] {
+        string product_code "รหัสสินค้า -- Short Text(255)"
+        string product_name PK "สินค้า -- Short Text(255)"
+        int price "ราคา -- Long Integer"
+        float pre_vat_price "ราคาก่อนแวท -- Single"
+        float shop_discount "ส่วนลดร้านค้า -- Double"
+        float shop_discount_pre_vat "ส่วนลดร้านค้าก่อนแวท -- Single"
+        decimal shop_price_incl_vat "ราคาร้านค้ารวมแวท -- Decimal(30,4)"
+        string unit "หน่วยนับ -- Short Text(10)"
+        int sequence_number "ลำดับที่ -- AutoNumber"
+    }
+```
+
+### Orders Domain ER Detail
+
+```mermaid
+erDiagram
+    order_details["order_details (รายละเอียดออเดอร์)"] {
+        int order_number PK "เลขที่ออเดอร์ -- AutoNumber"
+        int monthly_invoice_number "เลขที่invoiceของแต่ละเดือน -- Integer"
+        string yearly_invoice_number "เลขที่invoiceของปี -- Short Text(100)"
+        int member_number "หมายเลขสมาชิก -- Long Integer"
+        string phone_number "เบอร์โทรศัพท์ -- Short Text(10) FK"
+        string order_channel "ช่องทางสั่งซื้อ -- Short Text(255)"
+        datetime date "วันที่ -- Date/Time"
+        string bank "ธนาคาร -- Short Text(20)"
+        string transfer_time "เวลาโอนเงิน -- Short Text(255)"
+        string order_staff "พนักงานรับออเดอร์ -- Short Text(20)"
+        int manual_points_entry "คะแนนคีย์เอง -- Integer"
+        memo other_notes "หมายเหตุอื่นๆ -- Memo"
+        string shop_code "รหัสร้านค้า -- Short Text(30) FK"
+        float bill_end_discount_percent "ส่วนลดท้ายบิล -- Double"
+        datetime transfer_date "วันที่โอนเงิน -- Date/Time"
+        datetime invoice_date "วันที่inv -- Date/Time"
+    }
+
+    order_line_items["order_line_items (สินค้าในแต่ละออเดอร์)"] {
+        int id PK "id -- AutoNumber"
+        int order_number FK "เลขที่ออเดอร์ -- Long Integer"
+        string product_name FK "สินค้า -- Short Text(255)"
+        int quantity "จำนวน -- Integer"
+    }
+
+    order_details ||--o{ order_line_items : "order_number"
+```
+
+### Inventory Domain ER Detail
+
+```mermaid
+erDiagram
+    receipt_headers["receipt_headers (หัวใบรับเข้า)"] {
+        int receipt_number PK "เลขที่ใบรับเข้า -- AutoNumber"
+        int monthly_receipt_number "เลขที่ใบรับเข้าของแต่ละเดือน -- Long Integer"
+        string yearly_receipt_number "เลขที่ใบรับเข้าของปี -- Short Text(100)"
+        datetime receipt_date "วันที่รับเข้า -- Date/Time"
+        string producer_or_packer "ผู้ผลิต หรือ พนักงานแพ็ค -- Short Text(40)"
+        string inspection_staff "พนักงานตรวจเช็ค -- Short Text(20)"
+        string data_entry_staff "พนักงานบันทึกข้อมูล -- Short Text(50)"
+        string data_entry_reviewer "พนักงานตรวจการบันทึกข้อมูล -- Short Text(50)"
+        memo additional_details "รายละเอียดเพิ่มเติม -- Memo"
+    }
+
+    receipt_line_items["receipt_line_items (สินค้าในแต่ละใบรับเข้า)"] {
+        int ID PK "ID -- AutoNumber"
+        int receipt_number FK "เลขที่ใบรับเข้า -- Long Integer"
+        string product_name FK "สินค้า -- Short Text(255)"
+        int quantity_received "จำนวนรับเข้า -- Integer"
+        memo box_number "หมายเลขกล่อง -- Memo"
+    }
+
+    issue_headers["issue_headers (หัวใบเบิก)"] {
+        int issue_number PK "เลขที่ใบเบิก -- AutoNumber"
+        datetime issue_date "วันที่เบิก -- Date/Time"
+        memo issue_reason "เหตุผลการเบิก -- Memo"
+        string issuing_staff "พนักงานเบิก -- Short Text(20)"
+        string inspection_staff "พนักงานตรวจเช็ค -- Short Text(20)"
+        string data_entry_staff "พนักงานบันทึกข้อมูล -- Short Text(50)"
+        string data_entry_reviewer "พนักงานตรวจการบันทึกข้อมูล -- Short Text(50)"
+        memo additional_details "รายละเอียดเพิ่มเติม -- Memo"
+        int issue_member_number "หมายเลขสมาชิกที่เบิก -- Integer"
+        string issue_shop_code "รหัสร้านค้าที่เบิก -- Short Text(255)"
+    }
+
+    issue_line_items["issue_line_items (สินค้าในแต่ละใบเบิก)"] {
+        int ID PK "ID -- AutoNumber"
+        int issue_number FK "เลขที่ใบเบิก -- Long Integer"
+        string product_name FK "สินค้า -- Short Text(255)"
+        int quantity_issued "จำนวนเบิก -- Integer"
+        memo notes "หมายเหตุ -- Memo"
+    }
+
+    receipt_headers ||--o{ receipt_line_items : "receipt_number"
+    issue_headers ||--o{ issue_line_items : "issue_number"
+```
+
+### Customers Domain ER Detail
+
+```mermaid
+erDiagram
+    shop_info["shop_info (ข้อมูลร้านค้า)"] {
+        int shop_auto_id "รหัสร้านค้าออโต้ -- AutoNumber"
+        string shop_code PK "รหัสร้านค้า -- Short Text(15)"
+        string shop_name "ชื่อร้าน -- Short Text(50)"
+        string shop_phone "เบอร์โทรศัพท์ร้านค้า -- Short Text(15)"
+        string mobile_phone_2 "เบอร์โทรศัพท์2(มือถือ) -- Short Text(20)"
+        string store_phone "เบอร์ร้าน -- Short Text(20)"
+        string preferred_contact_channel "ช่องทางติดต่อที่สะดวก -- Short Text(30)"
+        string facebook_name "ชื่อเฟส -- Short Text(50)"
+        string facebook_messenger "เฟซบุค แมสเซนเจอร์ -- Short Text(30)"
+        string line_name "ชื่อไลน์ -- Short Text(50)"
+        string holidays "วันหยุด -- Short Text(50)"
+        string preferred_carrier "ขนส่งที่สะดวก -- Short Text(30)"
+        string address "ที่อยู่ -- Short Text(255)"
+        memo shop_specific_notes "หมายเหตุเฉพาะร้าน -- Memo"
+        string invoice_shop_name "ชื่อร้านสำหรับออกใบกำกับ -- Short Text(255)"
+        string invoice_address "ที่อยู่สำหรับออกใบกำกับ -- Short Text(255)"
+        string shop_tax_id "เลขประจำตัวผู้เสียภาษีร้านค้า -- Short Text(255)"
+        string head_office_branch "สาขาสำนักงานใหญ่ -- Short Text(20)"
+        string business_branch "สาขาสถานประกอบการ -- Short Text(20)"
+        string notes "หมายเหตุ -- Short Text(150)"
+        boolean received_large_sticker "ได้สติกเกอร์ใหญ่แล้ว -- Yes/No"
+        datetime record_created_date "วันที่สร้างข้อมูล -- Date/Time"
+        string bill_type_preference "เอาบิลอะไร -- Short Text(50)"
+        string vat_bill_asked "ถามเรื่องบิลแวทยัง -- Short Text(255)"
+        string ship_or_pay_first "ส่งของก่อนหรือโอนเงินก่อน -- Short Text(255)"
+    }
+
+    member_info["member_info (ข้อมูลสมาชิก)"] {
+        int member_auto_id "หมายเลขออโต้ -- AutoNumber"
+        int member_number "หมายเลขสมาชิก -- Long Integer"
+        string first_name "ชื่อ -- Short Text(255)"
+        string last_name "นามสกุล -- Short Text(255)"
+        int retail_tax_id "เลขประจำตัวผู้เสียภาษีปลีก -- Integer"
+        complex preferred_contact_channel "ช่องทางติดต่อที่สะดวก -- Complex/AutoNumber"
+        boolean received_sticker "ได้สติกเกอร์หรือยัง -- Yes/No"
+        int total_points "คะแนนรวม -- Long Integer"
+        string phone_number PK "เบอร์โทรศัพท์ -- Short Text(15)"
+        string line_or_facebook_name "ชื่อไลน์หรือเฟซ -- Short Text(255)"
+        string latest_address "ที่อยู่ล่าสุด -- Short Text(255)"
+        float manual_bonus_points "คะแนนคีย์มือเพิ่มให้ -- Double"
+        float points_redeemed_1 "คะแนนที่ใช้ครั้งที่1 -- Double"
+        float points_redeemed_2 "คะแนนที่ใช้ครั้งที่2 -- Double"
+        float points_redeemed_3 "คะแนนที่ใช้ครั้งที่3 -- Double"
+        string retail_invoice_name "ชื่อออกใบกำกับปลีก -- Short Text(255)"
+    }
+
+    customer_points_used["customer_points_used (คะแนนที่ลูกค้าใช้ไป) ABANDONED"] {
+        int member_number PK "หมายเลขสมาชิก -- Integer"
+        float manual_bonus_points "คะแนนคีย์มือเพิ่มให้ -- Double"
+        float points_used_1 "คะแนนที่ใช้ครั้งที่ 1 -- Double"
+        float points_used_2 "คะแนนที่ใช้ครั้งที่ 2 -- Double"
+        float points_used_3 "คะแนนที่ใช้ครั้งที่ 3 -- Double"
+        float points_used_4 "คะแนนที่ใช้ครั้งที่ 4 -- Double"
+        float points_used_5 "คะแนนที่ใช้ครั้งที่ 5 -- Double"
+    }
+```
+
+> **Note:** `customer_points_used` has 0 rows and no relationships -- it is an abandoned table. Points are tracked in fixed columns on `member_info` instead.
+
+### Relationship Details Table
+
+| # | Parent (English) | Child (English) | Parent Column | Child Column | Integrity | Notes |
+|---|---|---|---|---|---|---|
+| 1 | shop_info | order_details | shop_code | shop_code | None (UI lookup) | Shop-to-order link |
+| 2 | member_info | order_details | phone_number | phone_number | NO_INTEGRITY | Member-to-order link |
+| 3 | order_details | order_line_items | order_number | order_number | NO_INTEGRITY | Order header to lines |
+| 4 | products | order_line_items | product_name | product_name | NO_INTEGRITY | Product lookup in orders |
+| 5 | products | receipt_line_items | product_name | product_name | NO_INTEGRITY | Product lookup in receipts |
+| 6 | products | issue_line_items | product_name | product_name | NO_INTEGRITY | Product lookup in issues |
+| 7 | issue_headers | issue_line_items | issue_number | issue_number | NO_INTEGRITY | Issue header to lines |
+| 8 | receipt_headers | receipt_line_items | receipt_number | receipt_number | NO_INTEGRITY | Receipt header to lines |
+| 9 | order_details | remaining_points_after_use (query) | member_number | member_number | CASCADE_UPDATES | Table-to-query |
+| 10 | retail_order_line_items (query) | customer_total_points (query) | member_number | member_number | CASCADE_UPDATES, QUERY_BASED | Query-to-query |
+| 11 | products | product_stock (query) | product_name | product_name | CASCADE_UPDATES | Table-to-query |
+| 12 | products | total_sold_per_product (query) | product_name | product_name | CASCADE_UPDATES | Table-to-query |
+| 13 | MSysNavPaneGroupCategories | MSysNavPaneGroups | - | - | System | System nav |
+| 14 | MSysNavPaneGroups | MSysNavPaneGroupToObjects | - | - | System | System nav |
+
+---
+
+## Products Domain
+
+### Tables
+
+#### products (สินค้า)
+
+Product master table containing all sellable items, raw materials, and shipping fee entries.
+
+| English Name | Thai Name | Data Type | Size | Nullable | Notes |
+|---|---|---|---|---|---|
+| product_code | รหัสสินค้า | Short Text | 255 chars | Yes | Unique product identifier (e.g., POLLYLI'LRR30) |
+| product_name | สินค้า | Short Text | 255 chars | Yes | **Primary Key** -- product name is the PK |
+| price | ราคา | Long Integer | 4 bytes | Yes | Retail price, VAT-inclusive (baht) |
+| pre_vat_price | ราคาก่อนแวท | Single | 4 bytes | Yes | Price before 7% VAT |
+| shop_discount | ส่วนลดร้านค้า | Double | 8 bytes | Yes | Per-product shop discount (fixed baht amount) |
+| shop_discount_pre_vat | ส่วนลดร้านค้าก่อนแวท | Single | 4 bytes | Yes | Shop discount before VAT |
+| shop_price_incl_vat | ราคาร้านค้ารวมแวท | Decimal | 30,4 | Yes | Shop price with VAT (binary storage) |
+| unit | หน่วยนับ | Short Text | 10 chars | Yes | Unit of measure |
+| sequence_number | ลำดับที่ | Long Integer (AutoNumber) | 4 bytes | Yes | Auto-incrementing sort order |
+
+**Primary Key:** product_name (สินค้า) -- text-based natural key
+
+**Indexes:** PrimaryKey on product_name; 3 FK indexes (.rB, .rC, .rD)
+
+**Row Count:** 186 | **Status:** Active | **Avg Fill Rate:** 100%
+
+**Sample Data:**
+
+| product_code | product_name | price | pre_vat_price | shop_discount | unit |
+|---|---|---|---|---|---|
+| POLLYLI'LRR30 | POLLYLI'L LIME PEPPER FLAKE (RR30) | 65 | 60.75 | 0 | large_pack |
+| RNMIX | RUNNER MIX | 150 | 140.19 | 0 | KG |
+| RRTSF10 | Shipping fee Flash 10 | 10 | 9.35 | 0 | per_shipment |
+
+### Queries
+
+#### unit_value_list ("ซอง";"ตัว";"เม็ด")
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** products
+- **Purpose:** Value list query providing product unit type options (pack, piece, bead) for combo box dropdowns
+- **Key fields:** Distinct unit values from the products table
+
+#### product_and_material_report (qryรายงานสินค้าและวัตุดิบ)
+
+- **Type:** UNION | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details, products, order_line_items, receipt_line_items, issue_line_items
+- **Purpose:** Combined chronological report of ALL inventory movements -- receipts, issues, and sales in a single timeline per product. Uses `IIf(False, 0, Null)` as column placeholders to align the UNION columns.
+- **Key calculated fields:**
+  - `quantity_sold` (จำนวนขาย) -- alias for sales quantity in the UNION
+  - `document_number` (เลขที่ใบสำคัญ) -- alias for receipt/issue/order number in the UNION
+
+### Forms
+
+No dedicated forms exist for the Products domain. Product data is maintained directly through the table datasheet or via combo box lookups embedded in order, receipt, and issue forms.
+
+### Reports
+
+No dedicated reports exist for the Products domain. Product data appears as lookup fields within order, receipt, and issue reports.
+
+### Named Workflows
+
+The Products domain has no standalone workflow -- products serve as reference data for the Orders, Inventory, and Financial domains.
+
+---
+
+## Orders Domain
+
+### Tables
+
+#### order_details (รายละเอียดออเดอร์)
+
+Order header table storing one record per order, shared by both shop and retail channels.
+
+| English Name | Thai Name | Data Type | Size | Nullable | Notes |
+|---|---|---|---|---|---|
+| order_number | เลขที่ออเดอร์ | Long Integer (AutoNumber) | 4 bytes | Yes | **Primary Key** |
+| monthly_invoice_number | เลขที่invoiceของแต่ละเดือน | Integer | 2 bytes | Yes | Monthly sequential invoice counter |
+| yearly_invoice_number | เลขที่invoiceของปี | Short Text | 100 chars | Yes | Yearly code (e.g., 6612-010) |
+| member_number | หมายเลขสมาชิก | Long Integer | 4 bytes | Yes | Retail member link (0 if shop order) |
+| phone_number | เบอร์โทรศัพท์ | Short Text | 10 chars | Yes | FK to member_info (retail orders) |
+| order_channel | ช่องทางสั่งซื้อ | Short Text | 255 chars | Yes | LINE, FACEBOOK, other |
+| date | วันที่ | Date/Time | 8 bytes | Yes | Order creation date |
+| bank | ธนาคาร | Short Text | 20 chars | Yes | Payment method/status enum |
+| transfer_time | เวลาโอนเงิน | Short Text | 255 chars | Yes | Bank transfer time as text (e.g., 14.35) |
+| order_staff | พนักงานรับออเดอร์ | Short Text | 20 chars | Yes | Staff who received the order |
+| manual_points_entry | คะแนนคีย์เอง | Integer | 2 bytes | Yes | Manually keyed points override |
+| other_notes | หมายเหตุอื่นๆ | Memo | - | Yes | Order-level notes |
+| shop_code | รหัสร้านค้า | Short Text | 30 chars | Yes | FK to shop_info (shop orders) |
+| bill_end_discount_percent | ส่วนลดท้ายบิล(%) | Double | 8 bytes | Yes | Bill-end discount (0-34%) |
+| transfer_date | วันที่โอนเงิน | Date/Time | 8 bytes | Yes | Bank transfer payment date |
+| invoice_date | วันที่inv | Date/Time | 8 bytes | Yes | Invoice issue date |
+
+**Primary Key:** order_number (AutoNumber)
+
+**Indexes:** PrimaryKey; FK to shop_info (shop_code); FK to member_info; regular index on phone_number
+
+**Row Count:** 509 | **Status:** Active | **Avg Fill Rate:** 87%
+
+**Sample Data:**
+
+| order_number | yearly_invoice_number | date | bank | shop_code | phone_number |
+|---|---|---|---|---|---|
+| 4652 | 6612-010 | 2023-12-11 | cash | RT789 | |
+| 4653 | 6612-012 | 2023-12-11 | kasikorn_bank | RT510 | |
+| 4660 | 6612-016 | 2023-12-14 | kasikorn_bank | | 0842106951 |
+
+#### order_line_items (สินค้าในแต่ละออเดอร์)
+
+Individual product entries within each order.
+
+| English Name | Thai Name | Data Type | Size | Nullable | Notes |
+|---|---|---|---|---|---|
+| id | id | Long Integer (AutoNumber) | 4 bytes | Yes | **Primary Key** |
+| order_number | เลขที่ออเดอร์ | Long Integer | 4 bytes | Yes | FK to order_details |
+| product_name | สินค้า | Short Text | 255 chars | Yes | FK to products |
+| quantity | จำนวน | Integer | 2 bytes | Yes | Quantity ordered |
+
+**Primary Key:** id (AutoNumber)
+
+**Indexes:** PrimaryKey; FK to order_details (order_number); FK to products (product_name)
+
+**Row Count:** 7,073 | **Status:** Active | **Avg Fill Rate:** 100%
+
+**Sample Data:**
+
+| id | order_number | product_name | quantity |
+|---|---|---|---|
+| 48508 | 4582 | BOOM WHITE (RR1) | 5 |
+| 48509 | 4582 | BOOM BLACK (RR2) | 5 |
+| 48510 | 4582 | BOOM BLACK SHAD BLOOD (RR3) | 5 |
+
+### Queries
+
+#### shop_order_line_items (qry สินค้าในแต่ละออเดอร์ร้านค้า)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** shop_info, order_line_items
+- **Purpose:** Central shop order pricing query -- the most-referenced query in the system (11 dependents). Computes the complete shop pricing chain with 2-tier discounts.
+- **Key calculated fields (with formulas from pricing_discounts.md):**
+  - `price_after_shop_discount` = `price - shop_discount` (F-01)
+  - `total_after_shop_discount` = `price_after_shop_discount * quantity` (F-02)
+  - `total_after_bill_end_discount` = `total_after_shop_discount * (1 - (bill_end_discount_percent / 100))` (F-03)
+  - `pre_vat_after_shop_discount` = `pre_vat_price - shop_discount_pre_vat`
+  - `total_pre_vat_after_shop_discount` = `pre_vat_after_shop_discount * quantity`
+  - `total_pre_vat_after_bill_end_discount` = `total_pre_vat_after_shop_discount * (1 - (bill_end_discount_percent / 100))`
+  - `vat` = `total_pre_vat_after_bill_end_discount * 0.07` (F-04)
+  - `net_total_incl_vat` = `total_pre_vat_after_bill_end_discount + vat` (F-05)
+
+#### retail_order_line_items (qry สินค้าในแต่ละออเดอร์ปลีก)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details, order_line_items
+- **Purpose:** Retail order pricing with loyalty points calculation. Second most-referenced query (7 dependents).
+- **Key calculated fields:**
+  - `line_total` = `price * quantity` (F-06)
+  - `total_pre_vat` = `pre_vat_price * quantity`
+  - `retail_vat` = `total_pre_vat * 0.07` (F-07)
+  - `retail_net_total_incl_vat` = `total_pre_vat + retail_vat` (F-08)
+  - `points` = `line_total / 100` (F-09: 1 point per 100 baht)
+
+#### shop_order_lookup (qry เจาะจงหมายเลขออเดอร์ร้านค้า)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** Yes (`frm_salesorder_fishingshop!order_number`)
+- **Source tables:** order_details, products, order_line_items
+- **Purpose:** Look up a specific shop order by number, showing product details with pricing
+
+#### retail_order_lookup (qry เจาะจงหมายเลขออเดอร์ปลีก)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** Yes (`frm_salesorder_retail!order_number`)
+- **Source tables:** member_info, order_line_items
+- **Purpose:** Look up a specific retail order by number, showing member and product details
+
+#### shop_sales_totals (qry ยอดขายร้านค้า)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source queries:** shop_order_line_items
+- **Purpose:** Aggregate shop sales totals with before/after bill-end discount comparisons, filtered by date range
+
+#### retail_sales_totals (qry ยอดขายลูกค้าปลีก)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details | **Source queries:** retail_order_line_items
+- **Purpose:** Aggregate retail customer sales totals
+
+#### shops_awaiting_transfer (qry_ร้านค้ารอโอน)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details | **Source queries:** shop_order_line_items
+- **Purpose:** Filter shop orders where bank = "awaiting_transfer" -- shows pending payments
+
+#### shops_ship_before_payment (qry_ร้านค้าส่งของให้ก่อน)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details | **Source queries:** shop_order_line_items
+- **Purpose:** Filter shop orders where bank = "ship_before_payment" -- credit/advance shipment
+
+#### best_sellers_last_3_months (qry_สินค้าที่ขายดีย้อนหลัง 3 เดือน)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details, order_line_items
+- **Purpose:** Best-selling products ranked by quantity over last 3 months using `DateAdd("m", -3, Date())`
+
+#### shop_purchase_totals_per_vendor (qry ดูยอดซื้อร้านค้าแต่ละเจ้า)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details | **Source queries:** shop_order_line_items
+- **Purpose:** Purchase totals per shop vendor for accounts receivable tracking
+
+#### shop_annual_purchase_totals (qry ยอดซื้อร้านค้าทั้งปี)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details | **Source queries:** shop_order_line_items
+- **Purpose:** Annual shop purchase totals for year-end reporting
+
+#### shop_payment_amounts (qryยอดเงินร้านค้า)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details | **Source queries:** shop_order_line_items
+- **Purpose:** Shop payment amounts per order with transfer details
+
+#### combined_multi_order_quantities (ดูจำนวนรวมสินค้าที่สั่งหลายออเดอร์รวมกัน)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_line_items
+- **Purpose:** Combined product quantities across a range of orders (for batch packing)
+
+#### product_sales_by_date (จำนวนที่ขายของสินค้าแต่ละตัว(ระบุวันที่))
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** shop_info, order_line_items
+- **Purpose:** Quantity sold per product filtered by date range and shop name
+
+### Forms
+
+#### frm_salesorder_fishingshop
+
+- **Data Source:** order_details (header) + shop_order_line_items_subform (lines)
+- **Subforms:** frm_stck_fishingshop (stock display)
+- **Navigation:** Main entry point for shop orders. Opens shop reports for printing.
+- **Status:** **[INCOMPLETE - Corrupt VBA, inferred from related components]**
+- **Inference Level:** HIGH -- the subquery SQL `~sq_cfrm_salesorder_fishingshop~sq_cfrm_stck_fishingshop` reveals: joins order_details with shop_order_line_items and product_stock queries, filtered by order_number parameter. The form displays order header fields, embeds a line items subform, and shows real-time stock levels for ordered products. Report record sources (`~sq_rบิลร้านค้า`, `~sq_rpdf แจ้งยอด`, etc.) reference `frm_salesorder_fishingshop!order_number`, confirming this form triggers shop report printing.
+
+#### frm_salesorder_retail
+
+- **Data Source:** order_details (header) + retail_order_line_items (lines)
+- **Subforms:** frm_stck_retail (stock display), order_line_items_subform_1 (line items)
+- **Navigation:** Main entry point for retail orders. Opens retail reports.
+- **Status:** **[INCOMPLETE - Corrupt VBA, inferred from related components]**
+- **Inference Level:** HIGH -- subquery SQL shows: `~sq_cfrm_salesorder_retail~sq_cqry สินค้าในแต่ละออเดอร์ Subform1` selects from retail_order_line_items filtered by order_number; `~sq_cfrm_salesorder_retail~sq_cfrm_stck_retail` selects from retail_order_stock filtered by order_number. The form handles retail order creation with stock visibility and points display via embedded customer_points_subform.
+
+#### order_line_items_subform (qry สินค้าในแต่ละออเดอร์ Subform)
+
+- **Data Source:** retail_order_line_items (qry สินค้าในแต่ละออเดอร์ปลีก)
+- **Controls:** product_name (ComboBox), quantity (TextBox), price (TextBox), line_total (TextBox)
+- **Navigation:** Embedded as subform in retail order forms
+
+#### shop_order_line_items_subform (qry สินค้าในแต่ละออเดอร์ร้านค้า subform)
+
+- **Data Source:** Not in exported set (referenced by subquery naming convention)
+- **Navigation:** Embedded in frm_salesorder_fishingshop
+
+#### order_line_items_subform_1 (qry สินค้าในแต่ละออเดอร์ Subform1)
+
+- **Data Source:** retail_order_line_items (via subquery)
+- **Navigation:** Embedded in frm_salesorder_retail
+
+#### order_lookup_by_shop_name (หาเลขที่ออเดอร์ถ้ารู้ชื่อร้าน)
+
+- **Data Source:** SELECT from order_details + shop_info + member_info
+- **Controls:** order_number, shop_name, first_name, member_number (all TextBox)
+- **Navigation:** Standalone lookup form
+
+### Reports
+
+#### shop_bill (บิลร้านค้า)
+
+- **Data Source:** `~sq_rบิลร้านค้า` (SELECT from order_details, products, order_line_items WHERE order_number = `[Forms]![frm_salesorder_fishingshop]![order_number]`)
+- **Output Type:** Shop order bill
+- **Related Forms:** Triggered from frm_salesorder_fishingshop
+
+#### retail_customer_bill (บิลลูกค้าปลีก)
+
+- **Data Source:** Not in exported set (inferred from report name pattern)
+- **Output Type:** Retail customer bill
+- **Related Forms:** Triggered from frm_salesorder_retail
+
+#### shop_tax_invoice (ใบกำกับภาษีร้านค้า)
+
+- **Data Source:** `~sq_rใบกำกับภาษีร้านค้า(สำเนา)` (similar record source as shop_bill with pricing fields)
+- **Output Type:** Shop tax invoice (original)
+- **Key Fields:** yearly_invoice_number, sum_pre_vat_after_bill_end_discount, sum_vat, sum_net_total_incl_vat
+- **Related Forms:** Triggered from frm_salesorder_fishingshop
+
+#### shop_tax_invoice_copy (ใบกำกับภาษีร้านค้า(สำเนา))
+
+- **Data Source:** Same as shop_tax_invoice
+- **Output Type:** Shop tax invoice (copy)
+
+#### shop_tax_invoice_duplicate (Copy of ใบกำกับภาษีร้านค้า)
+
+- **Data Source:** `~sq_rCopy of ใบกำกับภาษีร้านค้า` (order_details, products, order_line_items)
+- **Output Type:** Additional duplicate of shop tax invoice
+
+#### retail_tax_invoice (ใบกำกับภาษีลูกค้าปลีก)
+
+- **Data Source:** Not in exported set
+- **Output Type:** Retail customer tax invoice (original)
+
+#### retail_tax_invoice_copy (ใบกำกับภาษีลูกค้าปลีก(สำเนา))
+
+- **Data Source:** Not in exported set
+- **Output Type:** Retail customer tax invoice (copy)
+
+#### shop_delivery_note (ใบส่งของร้านค้า)
+
+- **Data Source:** `~sq_rใบส่งของร้านค้า` (order_details, products, order_line_items)
+- **Output Type:** Packing/delivery slip for shop orders
+- **Related Forms:** Triggered from frm_salesorder_fishingshop
+
+#### shop_packing_list (ใบจัดสินค้าร้านค้า)
+
+- **Data Source:** Not in exported set
+- **Output Type:** Packing list for shop order fulfillment
+
+#### shop_bill_verification (ใบตรวจบิลร้านค้า)
+
+- **Data Source:** Not in exported set
+- **Output Type:** Bill verification/audit document
+
+#### balance_notification_pdf (pdf แจ้งยอด)
+
+- **Data Source:** `~sq_rpdf แจ้งยอด` (order_details, products, order_line_items)
+- **Output Type:** Balance notification in PDF format
+- **Related Forms:** Triggered from frm_salesorder_fishingshop
+
+#### order_detail_subreport (qry เจาะจงหมายเลขออเดอร์ subreport)
+
+- **Data Source:** retail_order_lookup (qry เจาะจงหมายเลขออเดอร์ปลีก)
+- **Controls:** order_number, phone_number, first_name, product_name, quantity, unit, price, line_total
+- **Output Type:** Subreport embedded in retail address printing report
+
+### Named Workflows
+
+#### Shop Order Flow
+
+```mermaid
+flowchart LR
+    subgraph Entry["Entry (Forms)"]
+        F1["frm_salesorder_fishingshop\n(CORRUPT)"]
+        F1sub["frm_stck_fishingshop\n(CORRUPT)"]
+        F1 --> F1sub
+    end
+
+    subgraph Storage["Storage (Tables)"]
+        T1["order_details\n(509 rows)"]
+        T2["order_line_items\n(7,073 rows)"]
+        T3["shop_info\n(735 rows)"]
+        T4["products\n(186 rows)"]
+    end
+
+    subgraph Logic["Logic (Queries)"]
+        Q1["shop_order_line_items\n(pricing + discounts)"]
+        Q2["shop_order_lookup"]
+        Q3["assign_invoice_number"]
+        Q4["product_stock"]
+    end
+
+    subgraph Output["Output (Reports)"]
+        R1["shop_bill"]
+        R2["shop_tax_invoice"]
+        R3["shop_delivery_note"]
+        R4["balance_notification_pdf"]
+    end
+
+    F1 --> T1
+    F1 --> T2
+    T1 --> Q1
+    T2 --> Q1
+    T3 --> Q1
+    T4 --> Q1
+    T1 --> Q3
+    Q4 --> F1sub
+    Q1 --> R1
+    Q1 --> R2
+    Q1 --> R3
+    Q1 --> R4
+    F1 -->|"prints"| R1
+```
+
+#### Retail Order Flow
+
+```mermaid
+flowchart LR
+    subgraph Entry["Entry (Forms)"]
+        F1["frm_salesorder_retail\n(CORRUPT)"]
+        F1a["order_line_items_subform_1"]
+        F1b["frm_stck_retail"]
+        F1c["customer_points_subform"]
+        F1 --> F1a
+        F1 --> F1b
+        F1 --> F1c
+    end
+
+    subgraph Storage["Storage (Tables)"]
+        T1["order_details"]
+        T2["order_line_items"]
+        T3["member_info\n(2,150 rows)"]
+        T4["products"]
+    end
+
+    subgraph Logic["Logic (Queries)"]
+        Q1["retail_order_line_items\n(pricing + points)"]
+        Q2["customer_total_points"]
+        Q3["remaining_points_after_use"]
+        Q4["retail_order_stock"]
+    end
+
+    subgraph Output["Output (Reports)"]
+        R1["retail_customer_bill"]
+        R2["retail_tax_invoice"]
+    end
+
+    F1 --> T1
+    F1a --> T2
+    T1 --> Q1
+    T2 --> Q1
+    T3 --> Q3
+    Q1 --> Q2
+    Q2 --> Q3
+    Q1 --> Q4
+    Q1 --> R1
+    Q1 --> R2
+    F1 -->|"prints"| R1
+```
+
+---
+
+## Inventory Domain
+
+### Tables
+
+#### receipt_headers (หัวใบรับเข้า)
+
+Goods receipt document headers -- one record per batch of products received.
+
+| English Name | Thai Name | Data Type | Size | Nullable | Notes |
+|---|---|---|---|---|---|
+| receipt_number | เลขที่ใบรับเข้า | Long Integer (AutoNumber) | 4 bytes | Yes | **Primary Key** |
+| monthly_receipt_number | เลขที่ใบรับเข้าของแต่ละเดือน | Long Integer | 4 bytes | Yes | Monthly sequential counter (all 0) |
+| yearly_receipt_number | เลขที่ใบรับเข้าของปี | Short Text | 100 chars | Yes | Yearly identifier (unused -- 0% fill) |
+| receipt_date | วันที่รับเข้า | Date/Time | 8 bytes | Yes | Date goods were received |
+| producer_or_packer | ผู้ผลิต หรือ พนักงานแพ็ค | Short Text | 40 chars | Yes | Producer name or packing staff |
+| inspection_staff | พนักงานตรวจเช็ค | Short Text | 20 chars | Yes | Staff who inspected |
+| data_entry_staff | พนักงานบันทึกข้อมูล | Short Text | 50 chars | Yes | Staff who entered data |
+| data_entry_reviewer | พนักงานตรวจการบันทึกข้อมูล | Short Text | 50 chars | Yes | Staff who reviewed entry |
+| additional_details | รายละเอียดเพิ่มเติม | Memo | - | Yes | Supplementary notes |
+
+**Primary Key:** receipt_number (AutoNumber)
+
+**Row Count:** 165 | **Status:** Active | **Avg Fill Rate:** 77%
+
+**Sample Data:**
+
+| receipt_number | receipt_date | producer_or_packer | inspection_staff |
+|---|---|---|---|
+| 2021 | 2022-10-28 | Khun Tar Thonglueang | Rattanaporn |
+| 2022 | 2022-11-04 | Khun Tar Thonglueang | Rattanaporn |
+
+#### receipt_line_items (สินค้าในแต่ละใบรับเข้า)
+
+Individual products within each goods receipt document.
+
+| English Name | Thai Name | Data Type | Size | Nullable | Notes |
+|---|---|---|---|---|---|
+| ID | ID | Long Integer (AutoNumber) | 4 bytes | Yes | **Primary Key** |
+| receipt_number | เลขที่ใบรับเข้า | Long Integer | 4 bytes | Yes | FK to receipt_headers |
+| product_name | สินค้า | Short Text | 255 chars | Yes | FK to products |
+| quantity_received | จำนวนรับเข้า | Integer | 2 bytes | Yes | Quantity received |
+| box_number | หมายเลขกล่อง | Memo | - | Yes | Box/carton identifier (0% fill) |
+
+**Primary Key:** ID (AutoNumber)
+
+**Row Count:** 514 | **Status:** Active | **Avg Fill Rate:** 80%
+
+#### issue_headers (หัวใบเบิก)
+
+Goods issue/withdrawal document headers.
+
+| English Name | Thai Name | Data Type | Size | Nullable | Notes |
+|---|---|---|---|---|---|
+| issue_number | เลขที่ใบเบิก | Long Integer (AutoNumber) | 4 bytes | Yes | **Primary Key** |
+| issue_date | วันที่เบิก | Date/Time | 8 bytes | Yes | Date of goods issue |
+| issue_reason | เหตุผลการเบิก | Memo | - | Yes | Reason for withdrawal |
+| issuing_staff | พนักงานเบิก | Short Text | 20 chars | Yes | Staff performing the issue |
+| inspection_staff | พนักงานตรวจเช็ค | Short Text | 20 chars | Yes | Staff who inspected |
+| data_entry_staff | พนักงานบันทึกข้อมูล | Short Text | 50 chars | Yes | Staff who entered data |
+| data_entry_reviewer | พนักงานตรวจการบันทึกข้อมูล | Short Text | 50 chars | Yes | Staff who reviewed entry |
+| additional_details | รายละเอียดเพิ่มเติม | Memo | - | Yes | Supplementary notes |
+| issue_member_number | หมายเลขสมาชิกที่เบิก | Integer | 2 bytes | Yes | Member receiving goods |
+| issue_shop_code | รหัสร้านค้าที่เบิก | Short Text | 255 chars | Yes | Shop receiving goods |
+
+**Primary Key:** issue_number (AutoNumber)
+
+**Row Count:** 3,391 | **Status:** Active | **Avg Fill Rate:** 72%
+
+#### issue_line_items (สินค้าในแต่ละใบเบิก)
+
+Individual products within each goods issue document.
+
+| English Name | Thai Name | Data Type | Size | Nullable | Notes |
+|---|---|---|---|---|---|
+| ID | ID | Long Integer (AutoNumber) | 4 bytes | Yes | **Primary Key** |
+| issue_number | เลขที่ใบเบิก | Long Integer | 4 bytes | Yes | FK to issue_headers |
+| product_name | สินค้า | Short Text | 255 chars | Yes | FK to products |
+| quantity_issued | จำนวนเบิก | Integer | 2 bytes | Yes | Quantity withdrawn |
+| notes | หมายเหตุ | Memo | - | Yes | Line item notes |
+
+**Primary Key:** ID (AutoNumber)
+
+**Row Count:** 15,293 | **Status:** Active | **Avg Fill Rate:** 80%
+
+### Queries
+
+#### product_stock (qry สต็อคสินค้า)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** products | **Source queries:** total_received_all_products, total_issued_all_products
+- **Purpose:** Calculate current stock levels for all products. The core inventory formula:
+  - `Stock = Nz(sum_quantity_received, 0) - Nz(sum_quantity, 0) - Nz(sum_quantity_issued, 0)` (F-11)
+  - Stock is NEVER stored -- recalculated on every query execution
+
+#### retail_order_stock (qry สต็อคสินค้าในแต่ละออเดอร์ปลีก)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source queries:** product_stock, retail_order_line_items
+- **Purpose:** Stock levels for products in the current retail order -- used by frm_stck_retail subform
+
+#### total_received_all_products (qry จำนวนรับเข้ารวม ของสินค้าทุกตัว)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** products, receipt_line_items
+- **Purpose:** `SUM(quantity_received)` grouped by product -- feeds into product_stock
+
+#### total_issued_all_products (qry จำนวนเบิกรวม ของสินค้าทุกตัว)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** products, issue_line_items
+- **Purpose:** `SUM(quantity_issued)` grouped by product -- feeds into product_stock
+
+#### total_sold_per_product (qry จำนวนที่ขายของสินค้าแต่ละตัว)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details, order_line_items
+- **Purpose:** `SUM(quantity)` grouped by product -- feeds into product_stock
+
+#### receipt_lookup (qry เจาะจงเลขที่ใบรับเข้า)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** Yes (`goods_receipt_form!receipt_number`)
+- **Source tables:** receipt_line_items, receipt_headers
+- **Purpose:** Look up a specific goods receipt by receipt number from the current form
+
+#### issue_lookup (qry เจาะจงเลขที่ใบเบิก)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** Yes (`goods_issue_form!issue_number`)
+- **Source tables:** issue_line_items, issue_headers
+- **Purpose:** Look up a specific goods issue by issue number from the current form
+
+### Forms
+
+#### goods_receipt_form (frm รับเข้าสินค้า)
+
+- **Data Source:** receipt_headers (header entry)
+- **Subforms:** receipt_line_items_subform
+- **Navigation:** Opens receipt_lookup query; prints goods_receipt_details report
+- **Status:** Not in exported set (inferred from subquery naming)
+
+#### receipt_line_items_subform (สินค้าในแต่ละใบรับเข้า Subform)
+
+- **Data Source:** SELECT from receipt_line_items + products (for unit lookup)
+- **Controls:** product_name (ComboBox), quantity_received (TextBox), unit (ComboBox), box_number (TextBox), product_code (TextBox)
+- **Navigation:** Embedded in goods_receipt_form
+
+#### goods_issue_form (frm เบิกสินค้า)
+
+- **Data Source:** issue_headers (header entry)
+- **Subforms:** issue_line_items_subform
+- **Navigation:** Opens issue_lookup query; prints print_goods_issue and related reports
+- **Status:** Not in exported set (inferred from subquery naming)
+
+#### issue_line_items_subform (สินค้าในแต่ละใบเบิก Subform)
+
+- **Data Source:** SELECT from issue_line_items + products (for unit lookup)
+- **Controls:** product_name (ComboBox), quantity_issued (TextBox), unit (ComboBox), notes (TextBox), delete button (CommandButton)
+- **Navigation:** Embedded in goods_issue_form
+
+#### product_stock_form (frm_สต็อคสินค้า)
+
+- **Data Source:** SELECT from product_stock query
+- **Controls:** product_code (TextBox), product_name (TextBox), unit (ComboBox), stock level expressions (TextBox x3), sum_quantity (TextBox)
+- **Navigation:** Standalone stock display form (15 controls)
+
+#### frm_stck_fishingshop
+
+- **Data Source:** product_stock joined with shop_order_line_items (via subquery SQL)
+- **Navigation:** Embedded in frm_salesorder_fishingshop
+- **Status:** **[INCOMPLETE - Corrupt VBA, inferred from related components]**
+- **Inference Level:** MEDIUM -- subquery SQL shows it displays stock levels for products in the current shop order, joining order_details -> shop_order_line_items -> product_stock, but exact control layout is unknown.
+
+#### qry stck subform2
+
+- **Data Source:** Unknown -- no subquery SQL found
+- **Navigation:** Unknown
+- **Status:** **[INCOMPLETE - Corrupt VBA, inferred from related components]**
+- **Inference Level:** LOW -- no subquery SQL was found for this form. Name suggests it is a stock display subform variant, possibly a secondary view used alongside frm_stck_fishingshop.
+
+### Reports
+
+#### print_goods_issue (ปรินท์ใบเบิกสินค้า)
+
+- **Data Source:** issue_lookup (qry เจาะจงเลขที่ใบเบิก)
+- **Key Fields:** product_name (ComboBox), quantity_issued (TextBox), unit (ComboBox)
+- **Output Type:** Goods issue print document
+- **Related Forms:** Triggered from goods_issue_form
+
+#### view_issue_numbers (rptดูเลขทีใบเบิก)
+
+- **Data Source:** SELECT from issue_headers with member and shop info joins
+- **Key Fields:** issue_number, issue_date, issue_member_number, shop_name, line_or_facebook_name
+- **Output Type:** Listing of all goods issue documents
+
+#### issue_address_labels (rptทำที่อยู่เบิกสินค้า)
+
+- **Data Source:** SELECT from issue_headers + shop_info + member_info
+- **Key Fields:** shop_name, address, shop_phone, holidays, preferred_carrier, first_name, last_name, latest_address, phone_number, issue_number
+- **Output Type:** Address labels for goods issue shipments (22 controls)
+
+#### goods_receipt_details (รายละเอียดใบรับเข้าสินค้า)
+
+- **Data Source:** SELECT from receipt_line_items + products (unit lookup)
+- **Key Fields:** product_name (ComboBox), quantity_received (TextBox), unit (ComboBox), box_number (TextBox)
+- **Output Type:** Goods receipt detail document
+
+### Named Workflows
+
+#### Goods Receipt Flow
+
+```mermaid
+flowchart LR
+    subgraph Entry["Entry (Forms)"]
+        F1["goods_receipt_form\n(frm รับเข้าสินค้า)"]
+        F1sub["receipt_line_items_subform"]
+        F1 --> F1sub
+    end
+
+    subgraph Storage["Storage (Tables)"]
+        T1["receipt_headers\n(165 rows)"]
+        T2["receipt_line_items\n(514 rows)"]
+        T3["products\n(186 rows)"]
+    end
+
+    subgraph Logic["Logic (Queries)"]
+        Q1["receipt_lookup"]
+        Q2["total_received_all_products"]
+    end
+
+    subgraph Output["Output (Reports)"]
+        R1["goods_receipt_details"]
+    end
+
+    F1 --> T1
+    F1sub --> T2
+    T3 -->|"unit lookup"| F1sub
+    T1 --> Q1
+    T2 --> Q1
+    T2 --> Q2
+    Q1 --> R1
+```
+
+#### Goods Issue Flow
+
+```mermaid
+flowchart LR
+    subgraph Entry["Entry (Forms)"]
+        F1["goods_issue_form\n(frm เบิกสินค้า)"]
+        F1sub["issue_line_items_subform"]
+        F1 --> F1sub
+    end
+
+    subgraph Storage["Storage (Tables)"]
+        T1["issue_headers\n(3,391 rows)"]
+        T2["issue_line_items\n(15,293 rows)"]
+        T3["products"]
+    end
+
+    subgraph Logic["Logic (Queries)"]
+        Q1["issue_lookup"]
+        Q2["total_issued_all_products"]
+    end
+
+    subgraph Output["Output (Reports)"]
+        R1["print_goods_issue"]
+        R2["view_issue_numbers"]
+        R3["issue_address_labels"]
+    end
+
+    F1 --> T1
+    F1sub --> T2
+    T3 -->|"unit lookup"| F1sub
+    T1 --> Q1
+    T2 --> Q1
+    T2 --> Q2
+    Q1 --> R1
+    T1 --> R2
+    T1 --> R3
+```
+
+#### Stock Calculation Flow
+
+```mermaid
+flowchart LR
+    subgraph Sources["Source Data"]
+        T1["receipt_line_items\n(514 rows)"]
+        T2["order_line_items\n(7,073 rows)"]
+        T3["issue_line_items\n(15,293 rows)"]
+    end
+
+    subgraph Aggregation["Aggregation (Queries)"]
+        Q1["total_received_all_products\nSUM(quantity_received)"]
+        Q2["total_sold_per_product\nSUM(quantity)"]
+        Q3["total_issued_all_products\nSUM(quantity_issued)"]
+    end
+
+    subgraph Calculation["Stock Formula"]
+        Q4["product_stock\nReceived - Sold - Issued"]
+    end
+
+    subgraph Display["Display"]
+        F1["product_stock_form"]
+        F2["frm_stck_fishingshop\n(in shop orders)"]
+        F3["frm_stck_retail\n(in retail orders)"]
+    end
+
+    T1 --> Q1
+    T2 --> Q2
+    T3 --> Q3
+    Q1 --> Q4
+    Q2 --> Q4
+    Q3 --> Q4
+    Q4 --> F1
+    Q4 --> F2
+    Q4 --> F3
+```
+
+---
+
+## Customers Domain
+
+### Tables
+
+#### shop_info (ข้อมูลร้านค้า)
+
+Shop/wholesale customer master table with comprehensive business information.
+
+| English Name | Thai Name | Data Type | Size | Nullable | Notes |
+|---|---|---|---|---|---|
+| shop_auto_id | รหัสร้านค้าออโต้ | Long Integer (AutoNumber) | 4 bytes | Yes | Surrogate key |
+| shop_code | รหัสร้านค้า | Short Text | 15 chars | Yes | **Primary Key** (e.g., RT789) |
+| shop_name | ชื่อร้าน | Short Text | 50 chars | Yes | Shop/store name |
+| shop_phone | เบอร์โทรศัพท์ร้านค้า | Short Text | 15 chars | Yes | Primary phone (97% fill) |
+| mobile_phone_2 | เบอร์โทรศัพท์2(มือถือ) | Short Text | 20 chars | Yes | Secondary mobile (6% fill) |
+| store_phone | เบอร์ร้าน | Short Text | 20 chars | Yes | Landline (2% fill) |
+| preferred_contact_channel | ช่องทางติดต่อที่สะดวก | Short Text | 30 chars | Yes | Preferred contact method |
+| facebook_name | ชื่อเฟส | Short Text | 50 chars | Yes | Facebook profile (47% fill) |
+| facebook_messenger | เฟซบุค แมสเซนเจอร์ | Short Text | 30 chars | Yes | Messenger contact (1% fill) |
+| line_name | ชื่อไลน์ | Short Text | 50 chars | Yes | LINE contact (41% fill) |
+| holidays | วันหยุด | Short Text | 50 chars | Yes | Closed days for delivery (84% fill) |
+| preferred_carrier | ขนส่งที่สะดวก | Short Text | 30 chars | Yes | Preferred shipper (83% fill) |
+| address | ที่อยู่ | Short Text | 255 chars | Yes | Shipping address |
+| shop_specific_notes | หมายเหตุเฉพาะร้าน | Memo | - | Yes | Shop-specific notes (2% fill) |
+| invoice_shop_name | ชื่อร้านสำหรับออกใบกำกับ | Short Text | 255 chars | Yes | Name for tax invoice |
+| invoice_address | ที่อยู่สำหรับออกใบกำกับ | Short Text | 255 chars | Yes | Invoice address |
+| shop_tax_id | เลขประจำตัวผู้เสียภาษีร้านค้า | Short Text | 255 chars | Yes | Tax ID (7% fill) |
+| head_office_branch | สาขาสำนักงานใหญ่ | Short Text | 20 chars | Yes | HQ branch number (1% fill) |
+| business_branch | สาขาสถานประกอบการ | Short Text | 20 chars | Yes | Business branch (0% fill) |
+| notes | หมายเหตุ | Short Text | 150 chars | Yes | General notes (0% fill) |
+| received_large_sticker | ได้สติกเกอร์ใหญ่แล้ว | Yes/No | 1 byte | Yes | Promotional sticker flag |
+| record_created_date | วันที่สร้างข้อมูล | Date/Time | 8 bytes | Yes | Record creation timestamp |
+| bill_type_preference | เอาบิลอะไร | Short Text | 50 chars | Yes | Bill type preference (99% fill) |
+| vat_bill_asked | ถามเรื่องบิลแวทยัง | Short Text | 255 chars | Yes | VAT billing asked flag (97% fill) |
+| ship_or_pay_first | ส่งของก่อนหรือโอนเงินก่อน | Short Text | 255 chars | Yes | Payment terms (100% fill) |
+
+**Primary Key:** shop_code (Short Text)
+
+**Row Count:** 735 | **Status:** Active | **Avg Fill Rate:** 61%
+
+**Sample Data:**
+
+| shop_code | shop_name | shop_phone | bill_type_preference | ship_or_pay_first |
+|---|---|---|---|---|
+| RT809 | Seven Sea Pro Shop (Thailand) Co., Ltd. | 098-294-5666 | tax_invoice | transfer_first_only |
+| RT810 | Perm Sin Shop | 088-703-2623 | regular_bill | transfer_first_only |
+
+#### member_info (ข้อมูลสมาชิก)
+
+Retail customer/member master table with loyalty points tracking.
+
+| English Name | Thai Name | Data Type | Size | Nullable | Notes |
+|---|---|---|---|---|---|
+| member_auto_id | หมายเลขออโต้ | Long Integer (AutoNumber) | 4 bytes | Yes | Surrogate key |
+| member_number | หมายเลขสมาชิก | Long Integer | 4 bytes | Yes | Manually assigned member # |
+| first_name | ชื่อ | Short Text | 255 chars | Yes | First name (94% fill) |
+| last_name | นามสกุล | Short Text | 255 chars | Yes | Last name (93% fill) |
+| retail_tax_id | เลขประจำตัวผู้เสียภาษีปลีก | Integer | 2 bytes | Yes | Tax ID (all 0 in data) |
+| preferred_contact_channel | ช่องทางติดต่อที่สะดวก | Complex (AutoNumber) | 4 bytes | Yes | Contact preference |
+| received_sticker | ได้สติกเกอร์หรือยัง | Yes/No | 1 byte | Yes | Sticker promotion flag |
+| total_points | คะแนนรวม | Long Integer | 4 bytes | Yes | Stored total (redundant) |
+| phone_number | เบอร์โทรศัพท์ | Short Text | 15 chars | Yes | **Primary Key** |
+| line_or_facebook_name | ชื่อไลน์หรือเฟซ | Short Text | 255 chars | Yes | Social contact (49% fill) |
+| latest_address | ที่อยู่ล่าสุด | Short Text | 255 chars | Yes | Most recent address (94% fill) |
+| manual_bonus_points | คะแนนคีย์มือเพิ่มให้ | Double | 8 bytes | Yes | Staff-added bonus points |
+| points_redeemed_1 | คะแนนที่ใช้ครั้งที่1 | Double | 8 bytes | Yes | 1st redemption amount |
+| points_redeemed_2 | คะแนนที่ใช้ครั้งที่2 | Double | 8 bytes | Yes | 2nd redemption amount |
+| points_redeemed_3 | คะแนนที่ใช้ครั้งที่3 | Double | 8 bytes | Yes | 3rd redemption amount |
+| retail_invoice_name | ชื่อออกใบกำกับปลีก | Short Text | 255 chars | Yes | Name for tax invoice |
+
+**Primary Key:** phone_number (Short Text) -- customers identified by phone
+
+**Row Count:** 2,150 | **Status:** Active | **Avg Fill Rate:** 95%
+
+**Sample Data:**
+
+| member_number | first_name | last_name | phone_number | total_points | points_redeemed_1 |
+|---|---|---|---|---|---|
+| 2128 | Khun Phanu | Hansongkhram | 0829081305 | 0 | 0 |
+| 2129 | Khun Panya | Suantako | 0811712777 | 0 | 0 |
+
+#### customer_points_used (คะแนนที่ลูกค้าใช้ไป)
+
+Abandoned points usage table with 5 redemption slots (vs 3 in member_info).
+
+| English Name | Thai Name | Data Type | Size | Nullable | Notes |
+|---|---|---|---|---|---|
+| member_number | หมายเลขสมาชิก | Integer | 2 bytes | Yes | **Primary Key** |
+| manual_bonus_points | คะแนนคีย์มือเพิ่มให้ | Double | 8 bytes | Yes | |
+| points_used_1 | คะแนนที่ใช้ครั้งที่ 1 | Double | 8 bytes | Yes | |
+| points_used_2 | คะแนนที่ใช้ครั้งที่ 2 | Double | 8 bytes | Yes | |
+| points_used_3 | คะแนนที่ใช้ครั้งที่ 3 | Double | 8 bytes | Yes | |
+| points_used_4 | คะแนนที่ใช้ครั้งที่ 4 | Double | 8 bytes | Yes | |
+| points_used_5 | คะแนนที่ใช้ครั้งที่ 5 | Double | 8 bytes | Yes | |
+
+**Primary Key:** member_number (Integer)
+
+**Row Count:** 0 | **Status:** Likely Abandoned | **Signals:** ZERO_ROWS, NO_RELATIONSHIPS
+
+### Queries
+
+#### customer_total_points (qry คะแนนรวมลูกค้าแต่ละคน)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source queries:** retail_order_line_items
+- **Purpose:** `SUM(points)` grouped by member_number -- total loyalty points per customer from all retail orders
+
+#### remaining_points_after_use (qry คะแนนคงเหลือหลังจากใช้แล้ว)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** Yes (`frm_salesorder_retail!member_number`)
+- **Source tables:** member_info | **Source queries:** customer_total_points
+- **Purpose:** Calculate remaining loyalty points:
+  - `Remaining = sum_points + manual_bonus_points - points_redeemed_1 - points_redeemed_2 - points_redeemed_3` (F-10)
+
+#### retail_addresses_by_date (qry ที่อยู่เจาะจงโดยวันที่ (ปลีก))
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** member_info, order_details
+- **Purpose:** Retail customer addresses filtered by order number range -- for batch shipping label printing. Uses parameter prompts: `enter_first_order_to_view`, `enter_last_order_to_view`
+
+#### shop_addresses_by_date (qry ที่อยู่เจาะจงโดยวันที่ (ร้านค้า))
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** member_info, order_details
+- **Purpose:** Shop addresses filtered by order number range. Uses parameter prompts: `enter_first_shop_order`, `enter_last_shop_order`
+
+### Forms
+
+#### member_info_form (frmข้อมูลสมาชิก)
+
+- **Data Source:** member_info table
+- **Controls:** Inferred from table schema -- member registration fields
+- **Navigation:** Standalone form for member data entry
+- **Status:** Not exported (not in SaveAsText set -- not corrupt, just not included)
+
+#### remaining_points_form (คะแนนคงเหลือหลังจากใช้แล้ว)
+
+- **Data Source:** SELECT from remaining_points_after_use query
+- **Controls:** member_number (Label/TextBox), remaining points expression (TextBox)
+- **Navigation:** Standalone form for viewing remaining loyalty points
+
+#### customer_points_subform (qry คะแนนรวมลูกค้าแต่ละคน subform)
+
+- **Data Source:** customer_total_points query
+- **Controls:** sum_points (TextBox)
+- **Navigation:** Embedded in order detail forms to show real-time points during order entry
+
+#### main_menu (หน้าหลัก)
+
+- **Data Source:** None (navigation-only form)
+- **Navigation:** Main application menu -- not exported
+- **Status:** Not exported (not in SaveAsText set)
+
+### Reports
+
+#### shop_tracking_notification (ข้อมูลสำหรับแจ้งเลขพัสดุร้านค้า)
+
+- **Data Source:** shop_addresses_by_date query
+- **Key Fields:** facebook_name (as shop name display), shop_name, order_channel, line_name
+- **Output Type:** Shipping tracking notification for shop orders
+
+#### retail_tracking_notification (ข้อมูลสำหรับแจ้งเลขพัสดุลูกค้าปลีก)
+
+- **Data Source:** retail_addresses_by_date query
+- **Key Fields:** line_or_facebook_name, first_name, last_name, order_channel
+- **Output Type:** Shipping tracking notification for retail orders
+
+#### print_retail_addresses (ปริ้นท์ที่อยู่ลูกค้าปลีก)
+
+- **Data Source:** retail_addresses_by_date query
+- **Key Fields:** first_name, last_name, latest_address, order_number, phone_number
+- **Output Type:** Address labels for retail order shipments
+- **Subreports:** Embeds order_detail_subreport
+
+#### print_addresses (ปริ้นท์ที่อยู่)
+
+- **Data Source:** Not in exported set
+- **Output Type:** General address label printing
+
+### Named Workflows
+
+#### Loyalty Points Flow
+
+```mermaid
+flowchart LR
+    subgraph Entry["Entry"]
+        F1["frm_salesorder_retail\n(CORRUPT)"]
+        F2["customer_points_subform\n(real-time display)"]
+        F3["remaining_points_form\n(standalone lookup)"]
+    end
+
+    subgraph Storage["Storage (Tables)"]
+        T1["member_info\n(2,150 rows)"]
+        T2["order_line_items\n(7,073 rows)"]
+    end
+
+    subgraph Logic["Logic (Queries)"]
+        Q1["retail_order_line_items\npoints = line_total / 100"]
+        Q2["customer_total_points\nSUM(points) per member"]
+        Q3["remaining_points_after_use\ntotal + manual - redeemed"]
+    end
+
+    T2 --> Q1
+    Q1 -->|"calculates points"| Q2
+    Q2 --> Q3
+    T1 -->|"manual_bonus_points\npoints_redeemed_1/2/3"| Q3
+    Q2 --> F2
+    Q3 --> F3
+    Q3 -->|"shown during\norder entry"| F1
+```
+
+---
+
+## Financial Domain
+
+### Tables
+
+The Financial domain does not have its own dedicated tables. It operates on shared tables from the Orders and Customers domains:
+
+- **order_details** -- order headers with bank/payment fields, invoice numbers, transfer dates
+- **shop_info** -- shop tax IDs, invoice names, billing addresses
+- **member_info** -- retail tax IDs, invoice names
+
+### Queries
+
+#### shop_transfer_details (qry รายละเอียดการโอนเงินร้านค้า)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** member_info | **Source queries:** retail_order_line_items, shop_order_line_items
+- **Purpose:** Shop bank transfer details with amounts -- joins both shop and retail pricing queries for comprehensive transfer tracking. Filtered by bank = "kasikorn_bank" or "ship_before_payment" and date range.
+
+#### retail_order_transfer_details (qry รายละเอียดการโอนแต่ละออเดอร์ปลีก)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details | **Source queries:** shop_order_line_items
+- **Purpose:** Retail order bank transfer details filtered by order number range
+
+#### transfer_datetime_by_invoice (qry วันที่และเวลาโอนเงินเรียงตามใบกำกับ)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details
+- **Purpose:** Transfer date and time sorted by invoice number -- for reconciliation. Filtered by invoice number range and bank = "kasikorn_bank"
+
+#### assign_invoice_number (qryกำหนดเลขที่inv)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** order_details
+- **Purpose:** Review and manage invoice number assignments. Filtered by invoice number range. **Risk:** Invoice numbers assigned via query-based counter -- potential race condition with concurrent users.
+
+#### enter_tax_invoice_number (qryใส่เลขที่ใบกำกับ)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** member_info, order_details
+- **Purpose:** Interface for assigning tax invoice numbers to orders. Filtered by bank type and date range.
+
+#### post_shop_payments (qryลงยอดร้านค้า)
+
+- **Type:** SELECT | **Parameterized:** No | **Form Refs:** No
+- **Source tables:** shop_info, order_details
+- **Purpose:** Post shop payment records -- shows shops with "ship_before_payment" status for payment reconciliation
+
+### Forms
+
+No dedicated forms exist for the Financial domain. Financial operations (invoice assignment, payment posting) are performed through query datasheets opened directly.
+
+### Reports
+
+#### sales_tax_report (รายงานภาษีขาย)
+
+- **Data Source:** `~sq_rรายงานภาษีขาย` (SELECT from shop_info, member_info with LEFT JOINs to both channel pricing queries)
+- **Key Fields:** yearly_invoice_number, sum_pre_vat_after_bill_end_discount, sum_vat, sum_net_total_incl_vat, sum_pre_vat_total, sum_retail_vat, shop_tax_id, retail_invoice_name, invoice_shop_name, business_branch, head_office_branch
+- **Output Type:** Sales tax summary report grouped by order
+
+#### sales_tax_verification_by_inv (ตรวจภาษีขายเรียงตามเลขinv)
+
+- **Data Source:** `~sq_rตรวจภาษีขายเรียงตามเลขinv` (same structure as sales_tax_report)
+- **Key Fields:** Same as sales_tax_report plus order_number, bank, transfer_date, transfer_time
+- **Output Type:** Sales tax verification sorted by invoice number (20 controls)
+
+#### sales_tax_verification (ตรวจภาษีขาย)
+
+- **Data Source:** Not in exported set (inferred from MSysObjects)
+- **Output Type:** Sales tax verification document
+
+#### transfer_details (รายละเอียดการโอน)
+
+- **Data Source:** Not in exported set
+- **Output Type:** Bank transfer details report
+
+#### transfer_details_per_order (rptรายละเอียดการโอนเงินของแต่ละเลขที่ออเดอร์)
+
+- **Data Source:** SELECT from order_details (order_number, transfer_date, transfer_time)
+- **Key Fields:** order_number, transfer_date, transfer_time
+- **Output Type:** Bank transfer details per order number
+
+### Named Workflows
+
+#### Payment Tracking Flow
+
+```mermaid
+flowchart LR
+    subgraph Source["Source Data"]
+        T1["order_details\n(bank field = payment status)"]
+        T2["shop_info\n(shop billing details)"]
+        T3["member_info\n(retail billing details)"]
+    end
+
+    subgraph Tracking["Payment Tracking (Queries)"]
+        Q1["shops_awaiting_transfer\nbank = 'awaiting_transfer'"]
+        Q2["shops_ship_before_payment\nbank = 'ship_before_payment'"]
+        Q3["shop_transfer_details\n(amounts + dates)"]
+        Q4["post_shop_payments\n(reconciliation)"]
+    end
+
+    subgraph Output["Output (Reports)"]
+        R1["transfer_details_per_order"]
+    end
+
+    T1 --> Q1
+    T1 --> Q2
+    T1 --> Q3
+    T2 --> Q4
+    Q3 --> R1
+```
+
+#### Tax Invoice Flow
+
+```mermaid
+flowchart LR
+    subgraph Assignment["Invoice Assignment"]
+        Q1["assign_invoice_number\n(qryกำหนดเลขที่inv)"]
+        Q2["enter_tax_invoice_number\n(qryใส่เลขที่ใบกำกับ)"]
+    end
+
+    subgraph Data["Data Sources"]
+        T1["order_details\n(invoice number fields)"]
+        Q3["shop_order_line_items\n(shop pricing)"]
+        Q4["retail_order_line_items\n(retail pricing)"]
+    end
+
+    subgraph Reports["Tax Reports"]
+        R1["sales_tax_report"]
+        R2["sales_tax_verification_by_inv"]
+        R3["shop_tax_invoice"]
+        R4["retail_tax_invoice"]
+    end
+
+    T1 --> Q1
+    T1 --> Q2
+    Q3 --> R1
+    Q4 --> R1
+    Q3 --> R2
+    Q4 --> R2
+    Q3 --> R3
+    Q4 --> R4
+```
