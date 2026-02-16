@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-14)
 ## Current Position
 
 Phase: 3 of 4 (Logic and Interface Extraction)
-Plan: 1 of 3 in current phase (03-01 complete)
-Status: 03-01 complete, ready for 03-02
-Last activity: 2026-02-15 -- Completed 03-01 (Query SQL Extraction & Assessment)
+Plan: 2 of 3 in current phase (03-02 complete)
+Status: 03-02 complete, ready for 03-03
+Last activity: 2026-02-15 -- Completed 03-02 (Windows Export Scripts & Access COM Extraction)
 
-Progress: [█████░░░░░] 50%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: ~6 min
-- Total execution time: ~0.5 hours
+- Total plans completed: 6
+- Average duration: ~6 min (excluding human-action plans)
+- Total execution time: ~0.5 hours (automated only)
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [█████░░░░░] 50%
 |-------|-------|-------|----------|
 | 01-setup-and-validation | 2/2 | ~18 min | ~9 min |
 | 02-schema-foundation | 2/2 | ~7 min | ~3.5 min |
-| 03-logic-and-interface-extraction | 1/3 | ~6 min | ~6 min |
+| 03-logic-and-interface-extraction | 2/3 | ~6 min + ~2 days | ~6 min (auto) |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (~3 min), 02-01 (~5 min), 02-02 (~2 min), 03-01 (~6 min)
-- Trend: Consistent (~4 min avg recent)
+- Last 5 plans: 02-01 (~5 min), 02-02 (~2 min), 03-01 (~6 min), 03-02 (~5 min auto + ~2 days human)
+- Trend: Consistent (~4 min avg for automated tasks)
 
 *Updated after each plan completion*
 
@@ -66,6 +66,10 @@ Recent decisions affecting current work:
 - [03-01]: Hidden ~sq_* subqueries categorized: ~sq_c (subform, 8), ~sq_d (lookup, 14), ~sq_r (report, 7)
 - [03-01]: Hub tables: สินค้า (26 refs), รายละเอียดออเดอร์ (23 refs) -- core business data
 - [03-01]: Hub query: qry สินค้าในแต่ละออเดอร์ร้านค้า (11 dependents) -- central to shop order processing
+- [03-02]: Only 7/17 forms exported -- 4 failed (corrupt VBA project: frm_salesorder_fishingshop, frm_salesorder_retail, frm_stck_fishingshop, qry stck subform2), 6 not present
+- [03-02]: Only 11/25 reports exported -- remaining 14 not present (MSysObjects inventory overcounted with system references)
+- [03-02]: 29 hidden subqueries exported (vs 8 estimated) -- all ~sq_c, ~sq_d, ~sq_r types captured
+- [03-02]: Corrupt VBA forms are unrecoverable without database repair; partial data available via their subquery SQL files
 
 ### Pending Todos
 
@@ -73,12 +77,13 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Research] [CONFIRMED in 01-02]: macOS cannot extract forms, reports, or VBA -- Windows environment IS NEEDED for Phase 3 (17 forms, 25 reports)
+- [Research] [RESOLVED in 03-02]: Windows export complete -- 7 forms, 11 reports extracted. 4 forms unrecoverable (corrupt VBA). Inventory overcounted forms/reports.
 - [Research] [RESOLVED in 01-01]: Thai encoding confirmed PASS with access_parser_c -- no mojibake, compression artifacts strippable
-- [Research]: oletools .accdb VBA support needs empirical validation; Windows/Access is fallback (no modules found in DB, so may be moot)
+- [Research] [RESOLVED in 03-02]: oletools moot -- zero VBA modules in database. Corrupt VBA in 4 forms is project-level corruption, not extractable by any tool.
+- [03-02] [ACTIVE]: 4 forms with corrupt VBA (frm_salesorder_fishingshop, frm_salesorder_retail, frm_stck_fishingshop, qry stck subform2) will be gaps in rebuild blueprint
 
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed 03-01-PLAN.md -- Query SQL extraction and assessment
-Resume file: .planning/phases/03-logic-and-interface-extraction/03-01-SUMMARY.md
+Stopped at: Completed 03-02-PLAN.md -- Windows export scripts and Access COM extraction
+Resume file: .planning/phases/03-logic-and-interface-extraction/03-02-SUMMARY.md

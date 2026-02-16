@@ -95,6 +95,7 @@ WScript.Echo "Opening Access database: " & dbPath
 Dim accessApp
 Set accessApp = CreateObject("Access.Application")
 accessApp.Visible = False
+accessApp.AutomationSecurity = 1  ' msoAutomationSecurityLow - trust all active content
 accessApp.OpenCurrentDatabase dbPath
 
 Dim db

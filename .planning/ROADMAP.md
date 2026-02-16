@@ -61,8 +61,8 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- Extract query SQL via Jackcess/JPype, classify types, build dependency graph, produce query assessment docs
-- [ ] 03-02-PLAN.md -- Create Windows export scripts (VBScript/PowerShell), user exports forms/reports on Windows
+- [x] 03-01-PLAN.md -- Extract query SQL via Jackcess/JPype, classify types, build dependency graph, produce query assessment docs
+- [x] 03-02-PLAN.md -- Create Windows export scripts (VBScript/PowerShell), user exports forms/reports on Windows
 - [ ] 03-03-PLAN.md -- Parse SaveAsText exports, produce form/report catalogues, synthesize business logic documentation
 
 ### Phase 4: Translation and Synthesis
@@ -89,5 +89,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Setup and Validation | 2/2 | ✓ Complete | 2026-02-14 |
 | 2. Schema Foundation | 2/2 | ✓ Complete | 2026-02-14 |
-| 3. Logic and Interface Extraction | 0/3 | Not started | - |
+| 3. Logic and Interface Extraction | 2/3 | In progress | - |
 | 4. Translation and Synthesis | 0/TBD | Not started | - |

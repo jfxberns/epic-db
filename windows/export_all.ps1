@@ -28,26 +28,13 @@ param(
 # ---------------------------------------------------------------------------
 # Resolve paths to absolute
 # ---------------------------------------------------------------------------
-$DbPath = (Resolve-Path -Path $DbPath -ErrorAction SilentlyContinue)?.Path
-if (-not $DbPath) {
-    $DbPath = $PSBoundParameters['DbPath']
-    if (-not $DbPath) { $DbPath = ".\epic_db.accdb" }
-    # Try the original path as-is
-    if (-not (Test-Path $DbPath)) {
-        Write-Host "ERROR: Database file not found: $DbPath" -ForegroundColor Red
-        Write-Host ""
-        Write-Host "Usage: .\export_all.ps1 -DbPath 'C:\path\to\epic_db.accdb' -OutputPath 'C:\path\to\export'"
-        exit 1
-    }
-    $DbPath = (Resolve-Path $DbPath).Path
-}
-
 if (-not (Test-Path $DbPath)) {
     Write-Host "ERROR: Database file not found: $DbPath" -ForegroundColor Red
     Write-Host ""
     Write-Host "Usage: .\export_all.ps1 -DbPath 'C:\path\to\epic_db.accdb' -OutputPath 'C:\path\to\export'"
     exit 1
 }
+$DbPath = (Resolve-Path $DbPath).Path
 
 # Resolve output path (create if needed)
 if (-not (Test-Path $OutputPath)) {
