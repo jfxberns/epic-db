@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Setup and Validation** - Validate extraction tooling, Thai encoding, and produce complete object inventory
 - [x] **Phase 2: Schema Foundation** - Extract all table definitions, relationships, indexes, and data profiles
-- [ ] **Phase 3: Logic and Interface Extraction** - Extract all queries, VBA modules, forms, and reports with business logic documentation
+- [x] **Phase 3: Logic and Interface Extraction** - Extract all queries, VBA modules, forms, and reports with business logic documentation
 - [ ] **Phase 4: Translation and Synthesis** - Translate all Thai content to English and produce the cross-referenced rebuild blueprint
 
 ## Phase Details
@@ -63,7 +63,7 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md -- Extract query SQL via Jackcess/JPype, classify types, build dependency graph, produce query assessment docs
 - [x] 03-02-PLAN.md -- Create Windows export scripts (VBScript/PowerShell), user exports forms/reports on Windows
-- [ ] 03-03-PLAN.md -- Parse SaveAsText exports, produce form/report catalogues, synthesize business logic documentation
+- [x] 03-03-PLAN.md -- Parse SaveAsText exports, produce form/report catalogues, synthesize business logic documentation
 
 ### Phase 4: Translation and Synthesis
 **Goal**: User has a fully English-translated, cross-referenced rebuild blueprint that stands alone as the complete specification for rebuilding the system
@@ -74,11 +74,12 @@ Plans:
   2. User can view all extracted documentation (schema, queries, VBA, forms, reports) with Thai content translated to English, including identification of Buddhist calendar dates and Thai business term mappings
   3. User can view a cross-reference map showing how all components connect (tables to queries to forms to reports to VBA) with a textual entity-relationship diagram
   4. User can view a rebuild feasibility assessment with effort estimates per component
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — Build complete Thai-English glossary with 3 views (domain-grouped, English alpha, Thai alpha)
+- [ ] 04-02-PLAN.md — Translated blueprint body: data model, domain sections, workflows, cross-references, risks
+- [ ] 04-03-PLAN.md — Rebuild assessment with technology recommendations, effort estimates, and phased rebuild plan
 
 ## Progress
 
@@ -89,5 +90,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Setup and Validation | 2/2 | ✓ Complete | 2026-02-14 |
 | 2. Schema Foundation | 2/2 | ✓ Complete | 2026-02-14 |
-| 3. Logic and Interface Extraction | 2/3 | In progress | - |
-| 4. Translation and Synthesis | 0/TBD | Not started | - |
+| 3. Logic and Interface Extraction | 3/3 | ✓ Complete | 2026-02-16 |
+| 4. Translation and Synthesis | 0/3 | Not started | - |
