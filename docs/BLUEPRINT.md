@@ -2192,3 +2192,413 @@ flowchart LR
     Q3 --> R3
     Q4 --> R4
 ```
+
+---
+
+## Cross-Reference Maps
+
+### Component Connection Diagram
+
+System-wide view showing how all major component types connect. This complements the per-domain workflows above with a cross-cutting perspective.
+
+```mermaid
+flowchart TB
+    subgraph Tables["Tables (10)"]
+        direction LR
+        T_prod["products\n(186)"]
+        T_ord["order_details\n(509)"]
+        T_oli["order_line_items\n(7,073)"]
+        T_rh["receipt_headers\n(165)"]
+        T_rli["receipt_line_items\n(514)"]
+        T_ih["issue_headers\n(3,391)"]
+        T_ili["issue_line_items\n(15,293)"]
+        T_shop["shop_info\n(735)"]
+        T_mem["member_info\n(2,150)"]
+        T_pts["customer_points_used\n(0 - abandoned)"]
+    end
+
+    subgraph Queries["Key Queries (33 user + 29 system)"]
+        direction LR
+        Q_shop["shop_order_line_items\n(11 dependents)"]
+        Q_ret["retail_order_line_items\n(7 dependents)"]
+        Q_stock["product_stock\n(calculated)"]
+        Q_pts["customer_total_points"]
+        Q_rem["remaining_points_after_use"]
+        Q_union["product_and_material_report\n(UNION)"]
+    end
+
+    subgraph Forms["Forms (17 total, 4 corrupt)"]
+        direction LR
+        F_shop["frm_salesorder_fishingshop\n(CORRUPT)"]
+        F_ret["frm_salesorder_retail\n(CORRUPT)"]
+        F_recv["goods_receipt_form"]
+        F_issue["goods_issue_form"]
+        F_stock["product_stock_form"]
+    end
+
+    subgraph Reports["Reports (25 total, 11 exported)"]
+        direction LR
+        R_bill["shop_bill / retail_bill"]
+        R_tax["tax invoices (4)"]
+        R_ship["tracking notifications (2)"]
+        R_inv["sales_tax_report"]
+    end
+
+    T_prod --> Q_shop
+    T_prod --> Q_ret
+    T_prod --> Q_stock
+    T_oli --> Q_shop
+    T_oli --> Q_ret
+    T_ord --> Q_shop
+    T_ord --> Q_ret
+    T_shop --> Q_shop
+    T_mem --> Q_rem
+    T_rli --> Q_stock
+    T_ili --> Q_stock
+    Q_shop --> F_shop
+    Q_ret --> F_ret
+    Q_stock --> F_stock
+    Q_ret --> Q_pts
+    Q_pts --> Q_rem
+    Q_shop --> R_bill
+    Q_ret --> R_bill
+    Q_shop --> R_tax
+    Q_ret --> R_tax
+    F_shop -->|"prints"| R_bill
+    F_ret -->|"prints"| R_bill
+    F_recv --> T_rh
+    F_recv --> T_rli
+    F_issue --> T_ih
+    F_issue --> T_ili
+```
+
+### Table-to-Query Matrix
+
+Shows which tables serve as data sources for which queries. Only user-visible queries shown (33 total).
+
+| Table (English) | shop_order_line_items | retail_order_line_items | product_stock | product_and_material_report | shop_order_lookup | retail_order_lookup | receipt_lookup | issue_lookup | remaining_points_after_use | Other queries |
+|---|---|---|---|---|---|---|---|---|---|---|
+| products | source | - | source | source | source | - | - | - | - | unit_value_list, total_received, total_issued |
+| order_details | - | source | - | source | source | - | - | - | - | 12 queries (sales, transfers, invoicing) |
+| order_line_items | source | source | - | source | source | source | - | - | - | best_sellers, product_sales_by_date, combined_multi_order |
+| receipt_headers | - | - | - | - | - | - | join | - | - | - |
+| receipt_line_items | - | - | - | source | - | - | source | - | - | total_received_all_products |
+| issue_headers | - | - | - | - | - | - | - | join | - | - |
+| issue_line_items | - | - | - | source | - | - | - | source | - | total_issued_all_products |
+| shop_info | source | - | - | - | - | - | - | - | - | post_shop_payments, product_sales_by_date |
+| member_info | - | - | - | - | - | source | - | - | source | retail_addresses, shop_addresses, enter_tax_invoice, shop_transfer_details |
+| customer_points_used | - | - | - | - | - | - | - | - | - | (no query references -- abandoned) |
+
+### Query-to-Form Matrix
+
+Shows which queries serve as record sources or subform data sources for forms.
+
+| Query (English) | product_stock_form | order_line_items_subform | remaining_points_form | customer_points_subform | receipt_line_items_subform | issue_line_items_subform | order_lookup_by_shop_name | frm_salesorder_fishingshop | frm_salesorder_retail |
+|---|---|---|---|---|---|---|---|---|---|
+| product_stock | record source | - | - | - | - | - | - | subform source (via frm_stck) | subform source (via frm_stck) |
+| retail_order_line_items | - | record source | - | - | - | - | - | - | subform source |
+| remaining_points_after_use | - | - | record source | - | - | - | - | - | display |
+| customer_total_points | - | - | - | record source | - | - | - | - | - |
+| shop_order_line_items | - | - | - | - | - | - | - | subform source | - |
+| receipt_lookup | - | - | - | - | - | - | - | - | - |
+| issue_lookup | - | - | - | - | - | - | - | - | - |
+
+> **Note:** receipt_lookup and issue_lookup are opened from goods_receipt_form and goods_issue_form respectively, but those parent forms are not in the exported set.
+
+### Query-to-Report Matrix
+
+Shows which queries serve as record sources for reports.
+
+| Query (English) | shop_bill | shop_tax_invoice | shop_delivery_note | balance_notification_pdf | retail_customer_bill | retail_tax_invoice | print_goods_issue | sales_tax_report | sales_tax_verification_by_inv | order_detail_subreport |
+|---|---|---|---|---|---|---|---|---|---|---|
+| shop_order_line_items | indirect (via ~sq_r) | indirect (via ~sq_r) | indirect (via ~sq_r) | indirect (via ~sq_r) | - | - | - | source (LEFT JOIN) | source (LEFT JOIN) | - |
+| retail_order_line_items | - | - | - | - | indirect | indirect | - | source (LEFT JOIN) | source (LEFT JOIN) | - |
+| retail_order_lookup | - | - | - | - | - | - | - | - | - | record source |
+| issue_lookup | - | - | - | - | - | - | record source | - | - | - |
+| retail_addresses_by_date | - | - | - | - | - | - | - | - | - | - |
+| shop_addresses_by_date | - | - | - | - | - | - | - | - | - | - |
+
+> **Note:** Most shop reports use `~sq_r*` system subqueries that embed inline SQL selecting from order_details, products, and order_line_items, filtered by `[Forms]![frm_salesorder_fishingshop]![order_number]`. The sales tax reports use LEFT JOINs to both channel pricing queries.
+
+### Form-to-Report Matrix
+
+Shows which forms trigger report generation (based on `[Forms]!` references in report record sources).
+
+| Form (English) | shop_bill | shop_tax_invoice / copy / duplicate | shop_delivery_note | balance_notification_pdf | retail_customer_bill | retail_tax_invoice / copy | print_goods_issue | goods_receipt_details | view_issue_numbers | Tracking notifications |
+|---|---|---|---|---|---|---|---|---|---|---|
+| frm_salesorder_fishingshop | triggers | triggers | triggers | triggers | - | - | - | - | - | - |
+| frm_salesorder_retail | - | - | - | - | triggers | triggers | - | - | - | - |
+| goods_issue_form | - | - | - | - | - | - | triggers | - | triggers | - |
+| goods_receipt_form | - | - | - | - | - | - | - | triggers | - | - |
+
+> **Note:** Tracking notification reports (shop_tracking_notification, retail_tracking_notification) use parameterized queries with order number range prompts, not `[Forms]!` references, so they are triggered independently.
+
+---
+
+## Risks, Anti-Patterns, and Improvement Opportunities
+
+This section consolidates all risks, anti-patterns, and improvement suggestions identified throughout the assessment. Each item describes what it is, why it matters, and what the rebuild should do differently.
+
+### Data Integrity Risks
+
+**1. All foreign keys use NO_INTEGRITY (grbit=0x00000002)**
+
+All 8 table-to-table relationships have NO_INTEGRITY set, meaning there is no cascade delete, no cascade update, and no restrict on orphan creation. Any child record can reference a non-existent parent. The only relationship with any constraint is shop_info -> order_details which has no integrity at all (UI lookup only, grbit=0).
+
+*Impact:* Orphaned order_line_items could reference deleted orders; issue_line_items could reference deleted products. Data quality depends entirely on the Access forms preventing invalid entries.
+
+*Rebuild recommendation:* Add proper FOREIGN KEY constraints with ON DELETE RESTRICT (or CASCADE where appropriate) on all relationships. Add database-level referential integrity checks.
+
+**2. Stock is calculated, never stored**
+
+Current stock is computed as `Received - Sold - Issued` across 3 sub-queries scanning 23,000+ rows every time. There is no stored balance, no stock snapshot, and no transaction log.
+
+*Impact:* Performance degrades linearly as transaction volume grows. Any bug in the receipt, order, or issue counts silently corrupts all stock readings. No ability to audit stock changes over time.
+
+*Rebuild recommendation:* Maintain a `stock_balance` column on a product_inventory table, updated transactionally. Keep a `stock_transactions` log table for audit trail. Optionally run periodic reconciliation jobs against the calculated value.
+
+**3. Payment status tracked via free-text field**
+
+The `bank` (ธนาคาร) field on order_details is a Short Text(20) field serving double duty as both payment method and payment status. Values include bank names ("kasikorn_bank"), status labels ("awaiting_transfer", "ship_before_payment"), and payment types ("cash").
+
+*Impact:* No enum constraint means typos create silent data quality issues. Query filters use exact string matching -- a misspelled value is invisible to payment tracking queries.
+
+*Rebuild recommendation:* Create a `payment_status` enum/lookup table with defined states (pending, paid, credit, cash). Separate payment method (bank name) from payment status. Add state machine transitions.
+
+**4. Points system uses 3 fixed columns instead of a transaction log**
+
+Loyalty points redemption is tracked in 3 hardcoded columns on member_info (`points_redeemed_1`, `points_redeemed_2`, `points_redeemed_3`), limiting each customer to exactly 3 lifetime redemptions.
+
+*Impact:* Business is constrained to 3 redemptions per customer forever. No audit trail of when redemptions occurred or what they were for. The abandoned `customer_points_used` table (with 5 slots) suggests this limitation was recognized but never resolved.
+
+*Rebuild recommendation:* Replace with a `points_transactions` table recording each earn/redeem event with date, amount, order reference, and running balance. Remove the fixed-column pattern entirely.
+
+### Structural Anti-Patterns
+
+**1. Abandoned table: customer_points_used (0 rows, no relationships)**
+
+This table has 7 columns (5 redemption slots), 0 rows, and no relationships. It appears to be an earlier, more generous attempt at a points redemption log (5 slots vs 3 on member_info) that was never populated.
+
+*Rebuild recommendation:* Exclude from rebuild. Replace the entire fixed-slot pattern with a transaction log.
+
+**2. Dual customer tables with no shared base**
+
+Shop customers (shop_info, 735 rows, 25 columns) and retail customers (member_info, 2,150 rows, 16 columns) are entirely separate tables with no shared customer base. Both have name, address, phone, tax ID fields but with different column sets and naming.
+
+*Impact:* A business that is both a shop and a retail customer exists as two unconnected records. Shared analytics (e.g., total revenue per entity) require manual cross-referencing.
+
+*Rebuild recommendation:* Normalize into a single `customers` table with a `customer_type` enum (shop/retail/both). Move type-specific fields (shop holidays, carrier preference, etc.) to a `customer_details` extension table or JSON column.
+
+**3. Single order table serves both channels**
+
+Both shop and retail orders go into the same `order_details` table, distinguished by which FK is populated: `shop_code` for shops, `phone_number` for retail. There is no explicit channel field.
+
+*Impact:* Channel-specific queries must infer the channel from FK presence. Mixed-channel analytics are straightforward but channel-specific reports need careful filtering.
+
+*Rebuild recommendation:* Add an explicit `order_channel_type` enum column. Consider whether business rules differ enough to warrant separate tables or if the shared approach is correct.
+
+**4. Invoice numbers managed via query-based counter**
+
+The query `assign_invoice_number` determines the next invoice number by querying existing records. With 1-3 concurrent users, this creates a race condition where two users could be assigned the same number.
+
+*Impact:* Duplicate invoice numbers are possible under concurrent access. Tax invoices require unique sequential numbers by Thai law.
+
+*Rebuild recommendation:* Use database-generated sequences (e.g., PostgreSQL SEQUENCE, or an auto-increment with proper locking) for invoice number assignment.
+
+**5. Some queries use [Forms]! parameter references**
+
+10 queries reference form control values directly (e.g., `[Forms]![frm_salesorder_fishingshop]![order_number]`), making them unusable outside their form context.
+
+*Impact:* These queries cannot be called from APIs, scheduled jobs, or test harnesses. They are tightly coupled to the Access form layer.
+
+*Rebuild recommendation:* Replace all `[Forms]!` references with parameterized queries. Pass parameters from the application layer.
+
+### Missing Features / Gaps
+
+**1. 4 corrupt forms -- core data entry path is damaged**
+
+The two main order entry forms (`frm_salesorder_fishingshop`, `frm_salesorder_retail`) and two stock subforms (`frm_stck_fishingshop`, `qry stck subform2`) have corrupt VBA projects and cannot be exported. These are the primary data entry interfaces for the business.
+
+*Impact:* The exact control layout, event handlers, and user flow of the main order forms must be inferred from subquery SQL, table schemas, and report references. HIGH confidence for both order forms; MEDIUM for frm_stck_fishingshop; LOW for qry stck subform2.
+
+*Rebuild recommendation:* Use the inferred behavior documented in this blueprint. Build the new order forms based on the query data flows and report requirements. Validate with the business users during development.
+
+**2. No audit trail**
+
+No `created_at`, `updated_at`, `created_by`, or `modified_by` timestamps exist on any table. Only `shop_info.record_created_date` tracks creation time for shops.
+
+*Rebuild recommendation:* Add `created_at`, `updated_at`, `created_by`, `updated_by` columns to all tables. Use database triggers or ORM hooks for automatic population.
+
+**3. No user authentication or access control**
+
+The database has no user tables, no login mechanism, and no role-based access. All 1-3 users have full access to all data and functions.
+
+*Rebuild recommendation:* Add user authentication, role-based access control (admin, order_entry, inventory, reporting roles), and audit logging of who performed which action.
+
+**4. No backup/export mechanism**
+
+There is no built-in backup, data export, or disaster recovery capability beyond relying on manual file copies of the .accdb file.
+
+*Rebuild recommendation:* Implement automated database backups, point-in-time recovery, and data export capabilities.
+
+### Improvement Opportunities for Rebuild
+
+| # | Current State | Recommended Change | Priority | Effort |
+|---|---|---|---|---|
+| 1 | Calculated stock (scan 23K+ rows) | Stored balance + transaction log | High | Medium |
+| 2 | 3-column points system | points_transactions table | High | Low |
+| 3 | Free-text payment status | Enum/lookup table with state machine | High | Low |
+| 4 | No referential integrity | Proper FK constraints with cascades | High | Low |
+| 5 | No audit timestamps | created_at, updated_at on all tables | High | Low |
+| 6 | Dual customer tables | Single customers table with type flag | Medium | Medium |
+| 7 | Text-based PK on products | Add numeric surrogate PK | Medium | Low |
+| 8 | Phone number as member PK | Add numeric surrogate PK | Medium | Low |
+| 9 | Query-based invoice counter | Database sequence with locking | Medium | Low |
+| 10 | [Forms]! coupled queries | Parameterized queries/API endpoints | Medium | Medium |
+| 11 | No user auth | Auth + RBAC + audit logging | Medium | High |
+| 12 | Shop/retail order inference by FK | Explicit channel_type column | Low | Low |
+
+---
+
+## Component-Type Index
+
+Quick-lookup appendix organized by component type.
+
+### All Tables
+
+| English Name | Thai Name | Domain | Rows | Status | Blueprint Section |
+|---|---|---|---|---|---|
+| products | สินค้า | Products | 186 | Active | [Products Domain > Tables](#products-domain) |
+| order_details | รายละเอียดออเดอร์ | Orders | 509 | Active | [Orders Domain > Tables](#orders-domain) |
+| order_line_items | สินค้าในแต่ละออเดอร์ | Orders | 7,073 | Active | [Orders Domain > Tables](#orders-domain) |
+| receipt_headers | หัวใบรับเข้า | Inventory | 165 | Active | [Inventory Domain > Tables](#inventory-domain) |
+| receipt_line_items | สินค้าในแต่ละใบรับเข้า | Inventory | 514 | Active | [Inventory Domain > Tables](#inventory-domain) |
+| issue_headers | หัวใบเบิก | Inventory | 3,391 | Active | [Inventory Domain > Tables](#inventory-domain) |
+| issue_line_items | สินค้าในแต่ละใบเบิก | Inventory | 15,293 | Active | [Inventory Domain > Tables](#inventory-domain) |
+| shop_info | ข้อมูลร้านค้า | Customers | 735 | Active | [Customers Domain > Tables](#customers-domain) |
+| member_info | ข้อมูลสมาชิก | Customers | 2,150 | Active | [Customers Domain > Tables](#customers-domain) |
+| customer_points_used | คะแนนที่ลูกค้าใช้ไป | Customers | 0 | Abandoned | [Customers Domain > Tables](#customers-domain) |
+
+### All Queries (User)
+
+| English Name | Thai Name | Type | Domain | Blueprint Section |
+|---|---|---|---|---|
+| unit_value_list | "ซอง";"ตัว";"เม็ด" | SELECT | Products | [Products Domain > Queries](#products-domain) |
+| product_and_material_report | qryรายงานสินค้าและวัตุดิบ | UNION | Products | [Products Domain > Queries](#products-domain) |
+| shop_order_line_items | qry สินค้าในแต่ละออเดอร์ร้านค้า | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| retail_order_line_items | qry สินค้าในแต่ละออเดอร์ปลีก | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| shop_order_lookup | qry เจาะจงหมายเลขออเดอร์ร้านค้า | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| retail_order_lookup | qry เจาะจงหมายเลขออเดอร์ปลีก | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| shop_sales_totals | qry ยอดขายร้านค้า | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| retail_sales_totals | qry ยอดขายลูกค้าปลีก | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| shops_awaiting_transfer | qry_ร้านค้ารอโอน | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| shops_ship_before_payment | qry_ร้านค้าส่งของให้ก่อน | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| best_sellers_last_3_months | qry_สินค้าที่ขายดีย้อนหลัง 3 เดือน | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| shop_purchase_totals_per_vendor | qry ดูยอดซื้อร้านค้าแต่ละเจ้า | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| shop_annual_purchase_totals | qry ยอดซื้อร้านค้าทั้งปี | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| shop_payment_amounts | qryยอดเงินร้านค้า | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| combined_multi_order_quantities | ดูจำนวนรวมสินค้าที่สั่งหลายออเดอร์รวมกัน | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| product_sales_by_date | จำนวนที่ขายของสินค้าแต่ละตัว(ระบุวันที่) | SELECT | Orders | [Orders Domain > Queries](#orders-domain) |
+| product_stock | qry สต็อคสินค้า | SELECT | Inventory | [Inventory Domain > Queries](#inventory-domain) |
+| retail_order_stock | qry สต็อคสินค้าในแต่ละออเดอร์ปลีก | SELECT | Inventory | [Inventory Domain > Queries](#inventory-domain) |
+| total_received_all_products | qry จำนวนรับเข้ารวม ของสินค้าทุกตัว | SELECT | Inventory | [Inventory Domain > Queries](#inventory-domain) |
+| total_issued_all_products | qry จำนวนเบิกรวม ของสินค้าทุกตัว | SELECT | Inventory | [Inventory Domain > Queries](#inventory-domain) |
+| total_sold_per_product | qry จำนวนที่ขายของสินค้าแต่ละตัว | SELECT | Inventory | [Inventory Domain > Queries](#inventory-domain) |
+| receipt_lookup | qry เจาะจงเลขที่ใบรับเข้า | SELECT | Inventory | [Inventory Domain > Queries](#inventory-domain) |
+| issue_lookup | qry เจาะจงเลขที่ใบเบิก | SELECT | Inventory | [Inventory Domain > Queries](#inventory-domain) |
+| customer_total_points | qry คะแนนรวมลูกค้าแต่ละคน | SELECT | Customers | [Customers Domain > Queries](#customers-domain) |
+| remaining_points_after_use | qry คะแนนคงเหลือหลังจากใช้แล้ว | SELECT | Customers | [Customers Domain > Queries](#customers-domain) |
+| retail_addresses_by_date | qry ที่อยู่เจาะจงโดยวันที่ (ปลีก) | SELECT | Customers | [Customers Domain > Queries](#customers-domain) |
+| shop_addresses_by_date | qry ที่อยู่เจาะจงโดยวันที่ (ร้านค้า) | SELECT | Customers | [Customers Domain > Queries](#customers-domain) |
+| shop_transfer_details | qry รายละเอียดการโอนเงินร้านค้า | SELECT | Financial | [Financial Domain > Queries](#financial-domain) |
+| retail_order_transfer_details | qry รายละเอียดการโอนแต่ละออเดอร์ปลีก | SELECT | Financial | [Financial Domain > Queries](#financial-domain) |
+| transfer_datetime_by_invoice | qry วันที่และเวลาโอนเงินเรียงตามใบกำกับ | SELECT | Financial | [Financial Domain > Queries](#financial-domain) |
+| assign_invoice_number | qryกำหนดเลขที่inv | SELECT | Financial | [Financial Domain > Queries](#financial-domain) |
+| enter_tax_invoice_number | qryใส่เลขที่ใบกำกับ | SELECT | Financial | [Financial Domain > Queries](#financial-domain) |
+| post_shop_payments | qryลงยอดร้านค้า | SELECT | Financial | [Financial Domain > Queries](#financial-domain) |
+
+### All Queries (System/Hidden)
+
+| Name | Type | Parent Object | Purpose |
+|---|---|---|---|
+| ~sq_cfrm เบิกสินค้า~sq_cสินค้าในแต่ละใบเบิก Subform | sq_c (subform) | goods_issue_form | Subform data: issue line items with product unit lookup |
+| ~sq_cfrm รับเข้าสินค้า~sq_cสินค้าในแต่ละใบรับเข้า Subform | sq_c (subform) | goods_receipt_form | Subform data: receipt line items with product unit lookup |
+| ~sq_cfrm_salesorder_fishingshop~sq_cfrm_stck_fishingshop | sq_c (subform) | frm_salesorder_fishingshop | Stock display: shop order products with current stock levels |
+| ~sq_cfrm_salesorder_retail~sq_cfrm_stck_retail | sq_c (subform) | frm_salesorder_retail | Stock display: retail order products with current stock levels |
+| ~sq_cfrm_salesorder_retail~sq_cqry สินค้าในแต่ละออเดอร์ Subform1 | sq_c (subform) | frm_salesorder_retail | Line items: retail order products filtered by current order |
+| ~sq_cqry สินค้าในแต่ละออเดอร์ Subform~sq_cสินค้า | sq_c (subform) | order_line_items_subform | Product lookup combo for order line items |
+| ~sq_cรายละเอียดออเดอร์~sq_cqry คะแนนรวมลูกค้าแต่ละคน subform | sq_c (subform) | order_details form | Points display subform embedded in order details |
+| ~sq_cรายละเอียดออเดอร์1~sq_cChild24 | sq_c (subform) | order_details form variant | Child subform (unknown purpose) |
+| ~sq_dCopy of ใบกำกับภาษีร้านค้า~sq_dสินค้า | sq_d (lookup) | shop_tax_invoice_duplicate | Product name lookup in tax invoice copy |
+| ~sq_dpdf แจ้งยอด~sq_dสินค้า | sq_d (lookup) | balance_notification_pdf | Product name lookup in balance notification |
+| ~sq_dqry เจาะจงหมายเลขออเดอร์ subreport~sq_dสินค้า | sq_d (lookup) | order_detail_subreport | Product name lookup in order subreport |
+| ~sq_dบิลร้านค้า~sq_dสินค้า | sq_d (lookup) | shop_bill | Product name lookup in shop bill |
+| ~sq_dบิลร้านค้า1~sq_dสินค้า | sq_d (lookup) | shop_bill variant | Product name lookup in shop bill variant |
+| ~sq_dบิลร้านค้า3~sq_dสินค้า | sq_d (lookup) | shop_bill variant | Product name lookup in shop bill variant |
+| ~sq_dบิลลูกค้าปลีก~sq_dคะแนนคงเหลือหลังจากใช้แล้ว | sq_d (lookup) | retail_customer_bill | Points remaining lookup in retail bill |
+| ~sq_dบิลลูกค้าปลีก~sq_dสินค้า | sq_d (lookup) | retail_customer_bill | Product name lookup in retail bill |
+| ~sq_dใบกำกับภาษีร้านค้า(สำเนา)~sq_dสินค้า | sq_d (lookup) | shop_tax_invoice_copy | Product name lookup in tax invoice copy |
+| ~sq_dใบกำกับภาษีลูกค้าปลีก(สำเนา)~sq_dสินค้า | sq_d (lookup) | retail_tax_invoice_copy | Product name lookup in retail tax invoice copy |
+| ~sq_dใบกำกับภาษีลูกค้าปลีก~sq_dคะแนนคงเหลือหลังจากใช้แล้ว | sq_d (lookup) | retail_tax_invoice | Points remaining lookup in retail tax invoice |
+| ~sq_dใบกำกับภาษีลูกค้าปลีก~sq_dสินค้า | sq_d (lookup) | retail_tax_invoice | Product name lookup in retail tax invoice |
+| ~sq_dใบส่งของร้านค้า~sq_dสินค้า | sq_d (lookup) | shop_delivery_note | Product name lookup in delivery note |
+| ~sq_dปรินท์ใบเบิกสินค้า~sq_dสินค้า | sq_d (lookup) | print_goods_issue | Product name lookup in goods issue print |
+| ~sq_rCopy of ใบกำกับภาษีร้านค้า | sq_r (report) | shop_tax_invoice_duplicate | Record source: order + product data for tax invoice duplicate |
+| ~sq_rpdf แจ้งยอด | sq_r (report) | balance_notification_pdf | Record source: order + product data for balance notification |
+| ~sq_rตรวจภาษีขายเรียงตามเลขinv | sq_r (report) | sales_tax_verification_by_inv | Record source: shop + member info for tax verification |
+| ~sq_rบิลร้านค้า | sq_r (report) | shop_bill | Record source: order + product data for shop bill |
+| ~sq_rใบกำกับภาษีร้านค้า(สำเนา) | sq_r (report) | shop_tax_invoice_copy | Record source: order + product data for tax invoice copy |
+| ~sq_rใบส่งของร้านค้า | sq_r (report) | shop_delivery_note | Record source: order + product data for delivery note |
+| ~sq_rรายงานภาษีขาย | sq_r (report) | sales_tax_report | Record source: shop + member info for sales tax report |
+
+### All Forms
+
+| English Name | Thai Name | Domain | Status | Blueprint Section |
+|---|---|---|---|---|
+| frm_salesorder_fishingshop | frm_salesorder_fishingshop | Orders | Corrupt | [Orders Domain > Forms](#orders-domain) |
+| frm_salesorder_retail | frm_salesorder_retail | Orders | Corrupt | [Orders Domain > Forms](#orders-domain) |
+| order_line_items_subform | qry สินค้าในแต่ละออเดอร์ Subform | Orders | Exported | [Orders Domain > Forms](#orders-domain) |
+| shop_order_line_items_subform | qry สินค้าในแต่ละออเดอร์ร้านค้า subform | Orders | Not exported | [Orders Domain > Forms](#orders-domain) |
+| order_line_items_subform_1 | qry สินค้าในแต่ละออเดอร์ Subform1 | Orders | Not exported | [Orders Domain > Forms](#orders-domain) |
+| order_lookup_by_shop_name | หาเลขที่ออเดอร์ถ้ารู้ชื่อร้าน | Orders | Exported | [Orders Domain > Forms](#orders-domain) |
+| goods_receipt_form | frm รับเข้าสินค้า | Inventory | Not exported | [Inventory Domain > Forms](#inventory-domain) |
+| receipt_line_items_subform | สินค้าในแต่ละใบรับเข้า Subform | Inventory | Exported | [Inventory Domain > Forms](#inventory-domain) |
+| goods_issue_form | frm เบิกสินค้า | Inventory | Not exported | [Inventory Domain > Forms](#inventory-domain) |
+| issue_line_items_subform | สินค้าในแต่ละใบเบิก Subform | Inventory | Exported | [Inventory Domain > Forms](#inventory-domain) |
+| product_stock_form | frm_สต็อคสินค้า | Inventory | Exported | [Inventory Domain > Forms](#inventory-domain) |
+| frm_stck_fishingshop | frm_stck_fishingshop | Inventory | Corrupt | [Inventory Domain > Forms](#inventory-domain) |
+| qry stck subform2 | qry stck subform2 | Inventory | Corrupt | [Inventory Domain > Forms](#inventory-domain) |
+| member_info_form | frmข้อมูลสมาชิก | Customers | Not exported | [Customers Domain > Forms](#customers-domain) |
+| remaining_points_form | คะแนนคงเหลือหลังจากใช้แล้ว | Customers | Exported | [Customers Domain > Forms](#customers-domain) |
+| customer_points_subform | qry คะแนนรวมลูกค้าแต่ละคน subform | Customers | Exported | [Customers Domain > Forms](#customers-domain) |
+| main_menu | หน้าหลัก | Customers | Not exported | [Customers Domain > Forms](#customers-domain) |
+
+### All Reports
+
+| English Name | Thai Name | Domain | Status | Blueprint Section |
+|---|---|---|---|---|
+| shop_bill | บิลร้านค้า | Orders | Not exported (record source exported as ~sq_r) | [Orders Domain > Reports](#orders-domain) |
+| retail_customer_bill | บิลลูกค้าปลีก | Orders | Not exported | [Orders Domain > Reports](#orders-domain) |
+| shop_tax_invoice | ใบกำกับภาษีร้านค้า | Orders | Not exported (record source exported as ~sq_r) | [Orders Domain > Reports](#orders-domain) |
+| shop_tax_invoice_copy | ใบกำกับภาษีร้านค้า(สำเนา) | Orders | Not exported (record source exported as ~sq_r) | [Orders Domain > Reports](#orders-domain) |
+| shop_tax_invoice_duplicate | Copy of ใบกำกับภาษีร้านค้า | Orders | Not exported (record source exported as ~sq_r) | [Orders Domain > Reports](#orders-domain) |
+| retail_tax_invoice | ใบกำกับภาษีลูกค้าปลีก | Orders | Not exported | [Orders Domain > Reports](#orders-domain) |
+| retail_tax_invoice_copy | ใบกำกับภาษีลูกค้าปลีก(สำเนา) | Orders | Not exported | [Orders Domain > Reports](#orders-domain) |
+| shop_delivery_note | ใบส่งของร้านค้า | Orders | Not exported (record source exported as ~sq_r) | [Orders Domain > Reports](#orders-domain) |
+| shop_packing_list | ใบจัดสินค้าร้านค้า | Orders | Not exported | [Orders Domain > Reports](#orders-domain) |
+| shop_bill_verification | ใบตรวจบิลร้านค้า | Orders | Not exported | [Orders Domain > Reports](#orders-domain) |
+| balance_notification_pdf | pdf แจ้งยอด | Orders | Not exported (record source exported as ~sq_r) | [Orders Domain > Reports](#orders-domain) |
+| order_detail_subreport | qry เจาะจงหมายเลขออเดอร์ subreport | Orders | Exported | [Orders Domain > Reports](#orders-domain) |
+| print_goods_issue | ปรินท์ใบเบิกสินค้า | Inventory | Exported | [Inventory Domain > Reports](#inventory-domain) |
+| view_issue_numbers | rptดูเลขทีใบเบิก | Inventory | Exported | [Inventory Domain > Reports](#inventory-domain) |
+| issue_address_labels | rptทำที่อยู่เบิกสินค้า | Inventory | Exported | [Inventory Domain > Reports](#inventory-domain) |
+| goods_receipt_details | รายละเอียดใบรับเข้าสินค้า | Inventory | Exported | [Inventory Domain > Reports](#inventory-domain) |
+| shop_tracking_notification | ข้อมูลสำหรับแจ้งเลขพัสดุร้านค้า | Customers | Exported | [Customers Domain > Reports](#customers-domain) |
+| retail_tracking_notification | ข้อมูลสำหรับแจ้งเลขพัสดุลูกค้าปลีก | Customers | Exported | [Customers Domain > Reports](#customers-domain) |
+| print_retail_addresses | ปริ้นท์ที่อยู่ลูกค้าปลีก | Customers | Exported | [Customers Domain > Reports](#customers-domain) |
+| print_addresses | ปริ้นท์ที่อยู่ | Customers | Not exported | [Customers Domain > Reports](#customers-domain) |
+| sales_tax_report | รายงานภาษีขาย | Financial | Exported (record source exported as ~sq_r) | [Financial Domain > Reports](#financial-domain) |
+| sales_tax_verification | ตรวจภาษีขาย | Financial | Not exported | [Financial Domain > Reports](#financial-domain) |
+| sales_tax_verification_by_inv | ตรวจภาษีขายเรียงตามเลขinv | Financial | Exported (record source exported as ~sq_r) | [Financial Domain > Reports](#financial-domain) |
+| transfer_details | รายละเอียดการโอน | Financial | Not exported | [Financial Domain > Reports](#financial-domain) |
+| transfer_details_per_order | rptรายละเอียดการโอนเงินของแต่ละเลขที่ออเดอร์ | Financial | Exported | [Financial Domain > Reports](#financial-domain) |
