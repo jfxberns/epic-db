@@ -1,0 +1,16 @@
+# Database files (binary, large)
+data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Claude Code local settings
+.claude/
+
+# macOS
+.DS_Store
+
+# Java class files (JARs in lib/ are tracked intentionally)
+*.class

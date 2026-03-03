@@ -1,0 +1,12 @@
+# Epic DB Assessment — Python dependencies
+# Install: pip install -r requirements.txt
+#
+# Also requires:
+#   - Java 11+ (for Jackcess via JPype) — brew install openjdk@11
+#   - Jackcess JARs in lib/ — see .planning/phases/03-logic-and-interface-extraction/03-RESEARCH.md
+
+# .accdb binary parser (McSash fork of access-parser)
+access-parser-c==0.0.7
+
+# Java-Python bridge for Jackcess query SQL extraction
+JPype1==1.6.0
