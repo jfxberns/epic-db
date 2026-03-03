@@ -11,7 +11,7 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 
 Milestone: v1.0 Epic DB Assessment — SHIPPED 2026-02-16
 Status: MILESTONE COMPLETE
-Last activity: 2026-02-16 -- Archived v1.0 milestone
+Last activity: 2026-03-03 -- Recovered 4 corrupt forms from 2019 backup, closed final todo
 
 Progress: [██████████] 100%
 
@@ -41,7 +41,7 @@ Full decision log archived in PROJECT.md Key Decisions table and milestones/v1.0
 
 ### Pending Todos
 
-1. Get older accdb files to check for non-corrupted form versions (database)
+(None)
 
 ### Blockers/Concerns
 
@@ -49,6 +49,6 @@ None active. All v1.0 blockers resolved.
 
 ## Session Continuity
 
-Last session: 2026-02-16
-Stopped at: v1.0 milestone archived
+Last session: 2026-03-03
+Stopped at: Corrupt-form recovery complete — 4 forms recovered from 2019 backup, BLUEPRINT.md updated, DB_VERSION_ERRORS.md created
 Next action: `/gsd:new-milestone` to define next scope

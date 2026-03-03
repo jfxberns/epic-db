@@ -86,7 +86,7 @@ The database manages the complete order-to-cash cycle for two sales channels -- 
 | Tables | 10 |
 | User queries | 33 |
 | Hidden system queries | 29 |
-| Forms | 17 (4 corrupt) |
+| Forms | 17 (4 recovered from 2019 backup) |
 | Reports | 25 (11 exported) |
 | Products | 186 |
 | Shop customers | 735 |
@@ -99,7 +99,7 @@ The database manages the complete order-to-cash cycle for two sales channels -- 
 **Key findings:**
 
 - **Zero VBA code** -- all business logic is implemented in SQL query calculated columns (11 distinct formulas identified)
-- **4 corrupt forms** -- the two main order entry forms (`frm_salesorder_fishingshop`, `frm_salesorder_retail`) and two stock subforms cannot be exported but are well-documented through their subquery SQL and report references
+- **4 recovered forms** -- the two main order entry forms (`frm_salesorder_fishingshop`, `frm_salesorder_retail`) and two stock subforms had corrupt VBA projects in all versions 2020+, but were recovered from the 2019-09-07 backup with full control inventories
 - **Calculated stock** -- inventory levels are never stored; stock is recalculated on every query as `received - sold - issued`
 - **No referential integrity** -- all foreign key relationships use `NO_INTEGRITY`, allowing orphaned records
 - **Bilingual requirement** -- all Thai terms have been mapped to English equivalents with Thai preserved for the bilingual UI rebuild
@@ -212,8 +212,8 @@ This glossary is the single source of truth for all Thai-to-English translations
 | SumOfราคาสุทธิปลีกรวมภาษีมูลค่าเพิ่ม | sum_retail_net_total_incl_vat | calculated_field | Aggregate: sum of retail net total |
 | SumOfราคารวมหลังหักส่วนลดท้ายบิล | sum_total_after_bill_end_discount | calculated_field | Aggregate: sum of totals after bill-end discount |
 | SumOfจำนวน | sum_quantity | calculated_field | Aggregate: total quantity sold |
-| frm_salesorder_fishingshop | frm_salesorder_fishingshop | form_name | Already English -- Shop order entry form (CORRUPT) |
-| frm_salesorder_retail | frm_salesorder_retail | form_name | Already English -- Retail order entry form (CORRUPT) |
+| frm_salesorder_fishingshop | frm_salesorder_fishingshop | form_name | Already English -- Shop order entry form (Recovered from 2019 backup) |
+| frm_salesorder_retail | frm_salesorder_retail | form_name | Already English -- Retail order entry form (Recovered from 2019 backup) |
 | qry สินค้าในแต่ละออเดอร์ Subform | order_line_items_subform | form_name | Retail order line items subform |
 | qry สินค้าในแต่ละออเดอร์ร้านค้า subform | shop_order_line_items_subform | form_name | Shop order line items subform |
 | qry สินค้าในแต่ละออเดอร์ Subform1 | order_line_items_subform_1 | form_name | Retail order line items subform variant |
@@ -289,8 +289,8 @@ This glossary is the single source of truth for all Thai-to-English translations
 | frm รับเข้าสินค้า | goods_receipt_form | form_name | Goods receipt entry form |
 | frm เบิกสินค้า | goods_issue_form | form_name | Goods issue/withdrawal form |
 | frm_สต็อคสินค้า | product_stock_form | form_name | Stock level display form |
-| frm_stck_fishingshop | frm_stck_fishingshop | form_name | Already English -- Shop stock subform (CORRUPT) |
-| qry stck subform2 | qry stck subform2 | form_name | Already English -- Stock subform variant (CORRUPT) |
+| frm_stck_fishingshop | frm_stck_fishingshop | form_name | Already English -- Shop stock subform (Recovered from 2019 backup) |
+| qry stck subform2 | qry stck subform2 | form_name | Already English -- Stock subform variant (Recovered from 2019 backup) |
 | สินค้าในแต่ละใบรับเข้า Subform | receipt_line_items_subform | form_name | Receipt line items subform |
 | สินค้าในแต่ละใบเบิก Subform | issue_line_items_subform | form_name | Issue line items subform |
 | ปรินท์ใบเบิกสินค้า | print_goods_issue | report_name | Print goods issue document |
@@ -1381,19 +1381,50 @@ Individual product entries within each order.
 
 #### frm_salesorder_fishingshop
 
-- **Data Source:** order_details (header) + shop_order_line_items_subform (lines)
-- **Subforms:** frm_stck_fishingshop (stock display)
-- **Navigation:** Main entry point for shop orders. Opens shop reports for printing.
-- **Status:** **[INCOMPLETE - Corrupt VBA, inferred from related components]**
-- **Inference Level:** HIGH -- the subquery SQL `~sq_cfrm_salesorder_fishingshop~sq_cfrm_stck_fishingshop` reveals: joins order_details with shop_order_line_items and product_stock queries, filtered by order_number parameter. The form displays order header fields, embeds a line items subform, and shows real-time stock levels for ordered products. Report record sources (`~sq_rบิลร้านค้า`, `~sq_rpdf แจ้งยอด`, etc.) reference `frm_salesorder_fishingshop!order_number`, confirming this form triggers shop report printing.
+- **Data Source:** `SELECT` from order_details (`รายละเอียดออเดอร์`) INNER JOIN shop_info (`ข้อมูลร้านค้า`) ON shop_code — fields: order_number, order_channel, date, bank, transfer_time, staff, shop_code, shop_name, notes, address, transfer_date
+- **Controls (14):**
+  - order_number (TextBox), date (TextBox, Short Date format), shop_code (TextBox), shop_name (TextBox, locked), address (TextBox), notes (TextBox), transfer_date (TextBox), transfer_time (TextBox)
+  - order_channel (ComboBox, Value List: "FACEBOOK", "LINE", "โทรศัพท์", "อื่นๆ")
+  - staff (ComboBox, Value List: "กมลวรรณ", "ขนิษฐา", "สมถวิล", "รัตนาพร")
+  - bank (ComboBox, Value List: "กสิกร", "ไทยพานิชย์", "กรุงเทพ", "กรุงไทย", "ส่งของให้ก่อน", "รอโอน", "เบิกสินค้า")
+- **Command Buttons (7):**
+  - "ออเดอร์ใหม่" (New Order) — GoToRecord → New, with error handling
+  - "บันทึก" (Save) — RunCommand → Save
+  - "หาออเดอร์เก่า" (Find Old Order) — RunCommand → Find
+  - "พิมพ์" (Print) — OpenReport → shop bill (`บิลร้านค้า`) via ChrW encoding
+  - "กลับหน้าหลัก" (Back to Main Menu) — OpenForm → หน้าหลัก
+  - "ลบสินค้า" (Delete Product) — RunCommand → Delete Record, with new-record guard
+  - "เปิดบิลตัวจริง" (Open Real Bill) — OpenReport → tax invoice
+  - "ใบจัดสินค้า" (Packing List) — OpenReport → packing list
+- **Subforms (2):**
+  - shop_order_line_items_subform (`qry สินค้าในแต่ละออเดอร์ร้านค้า subform`), linked by order_number
+  - frm_stck_fishingshop, linked by order_number
+- **Navigation:** Main entry point for shop orders; embedded label warns "คลิกออเดอร์ใหม่ก่อนทุกครั้ง" (Click New Order every time)
+- **Event:** OnActivate → GoToRecord (new), SetFocus to shop_code
+- **Status:** Recovered from 2019-09-07 backup (corrupt in all versions 2020+)
 
 #### frm_salesorder_retail
 
-- **Data Source:** order_details (header) + retail_order_line_items (lines)
-- **Subforms:** frm_stck_retail (stock display), order_line_items_subform_1 (line items)
-- **Navigation:** Main entry point for retail orders. Opens retail reports.
-- **Status:** **[INCOMPLETE - Corrupt VBA, inferred from related components]**
-- **Inference Level:** HIGH -- subquery SQL shows: `~sq_cfrm_salesorder_retail~sq_cqry สินค้าในแต่ละออเดอร์ Subform1` selects from retail_order_line_items filtered by order_number; `~sq_cfrm_salesorder_retail~sq_cfrm_stck_retail` selects from retail_order_stock filtered by order_number. The form handles retail order creation with stock visibility and points display via embedded customer_points_subform.
+- **Data Source:** `SELECT` from order_details (`รายละเอียดออเดอร์`) INNER JOIN member_info (`ข้อมูลสมาชิก`) ON phone_number — fields: order_number, phone, order_channel, date, bank, transfer_time, staff, first_name, last_name, member_number, notes, sticker_received, latest_address, transfer_date
+- **Controls (13):**
+  - order_number (TextBox), date (TextBox), phone (TextBox, InputMask `000-000-0000`), member_number (TextBox), first_name (TextBox), last_name (TextBox), latest_address (TextBox), notes (TextBox), transfer_time (TextBox), transfer_date (TextBox)
+  - order_channel (ComboBox, Value List: "FACEBOOK", "LINE", "โทรศัพท์", "อื่นๆ")
+  - bank (ComboBox, Value List: "กสิกร", "ไทยพานิชย์", "กรุงเทพ", "กรุงไทย", "ส่งของให้ก่อน", "รอโอน", "เบิกสินค้า")
+  - staff (ComboBox, Value List: "กมลวรรณ", "ขนิษฐา", "สมถวิล", "รัตนาพร")
+- **Command Buttons (6):**
+  - "ออเดอร์ใหม่" (New Order) — GoToRecord → New, with error handling
+  - "บันทึก" (Save) — RunCommand → Save
+  - "หาออเดอร์เก่า" (Find Old Order) — RunCommand → Find
+  - "พิมพ์" (Print) — OpenReport
+  - "กลับหน้าหลัก" (Back to Main Menu) — OpenForm → หน้าหลัก
+  - "ลบสินค้า" (Delete Product) — RunCommand → Delete Record, with new-record guard
+- **Subforms (2):**
+  - order_line_items_subform_1 (`qry สินค้าในแต่ละออเดอร์ Subform1`), linked by order_number
+  - qry stck subform2, linked by order_number
+- **Navigation:** Main entry point for retail orders; same "คลิกออเดอร์ใหม่ก่อนทุกครั้ง" warning label; includes promotional pricing label (bait bonus tiers by order total)
+- **Event:** OnActivate → GoToRecord (new)
+- **Note:** sticker_received (`ได้สติกเกอร์หรือยัง`) is in the RecordSource SELECT but has no visible control on the form
+- **Status:** Recovered from 2019-09-07 backup (corrupt in all versions 2020+)
 
 #### order_line_items_subform (qry สินค้าในแต่ละออเดอร์ Subform)
 
@@ -1493,8 +1524,8 @@ Individual product entries within each order.
 ```mermaid
 flowchart LR
     subgraph Entry["Entry (Forms)"]
-        F1["frm_salesorder_fishingshop\n(CORRUPT)"]
-        F1sub["frm_stck_fishingshop\n(CORRUPT)"]
+        F1["frm_salesorder_fishingshop\n(Recovered 2019)"]
+        F1sub["frm_stck_fishingshop\n(Recovered 2019)"]
         F1 --> F1sub
     end
 
@@ -1539,7 +1570,7 @@ flowchart LR
 ```mermaid
 flowchart LR
     subgraph Entry["Entry (Forms)"]
-        F1["frm_salesorder_retail\n(CORRUPT)"]
+        F1["frm_salesorder_retail\n(Recovered 2019)"]
         F1a["order_line_items_subform_1"]
         F1b["frm_stck_retail"]
         F1c["customer_points_subform"]
@@ -1748,17 +1779,19 @@ Individual products within each goods issue document.
 
 #### frm_stck_fishingshop
 
-- **Data Source:** product_stock joined with shop_order_line_items (via subquery SQL)
-- **Navigation:** Embedded in frm_salesorder_fishingshop
-- **Status:** **[INCOMPLETE - Corrupt VBA, inferred from related components]**
-- **Inference Level:** MEDIUM -- subquery SQL shows it displays stock levels for products in the current shop order, joining order_details -> shop_order_line_items -> product_stock, but exact control layout is unknown.
+- **Data Source:** `SELECT` from order_details (`รายละเอียดออเดอร์`) INNER JOIN shop_order_line_items query (`qry สินค้าในแต่ละออเดอร์ร้านค้า`) INNER JOIN product_stock query (`qry สต็อคสินค้า`) — fields: order_number, product_name, Expr1 (stock level); ORDER BY product_name
+- **Controls (2):** product_name label ("สต็อค"), Expr1 (TextBox — stock quantity, locked, centered, bold)
+- **Navigation:** Embedded as subform in frm_salesorder_fishingshop, linked by order_number
+- **Status:** Recovered from 2019-09-07 backup (corrupt in all versions 2020+)
 
 #### qry stck subform2
 
-- **Data Source:** Unknown -- no subquery SQL found
-- **Navigation:** Unknown
-- **Status:** **[INCOMPLETE - Corrupt VBA, inferred from related components]**
-- **Inference Level:** LOW -- no subquery SQL was found for this form. Name suggests it is a stock display subform variant, possibly a secondary view used alongside frm_stck_fishingshop.
+- **Data Source:** `qry สต็อคสินค้าในแต่ละออเดอร์ปลีก` (retail order stock query)
+- **Caption:** "qry สต็อคสินค้าในแต่ละออเดอร์ subform2"
+- **Controls (2):** product_name label ("สต็อค"), Expr1 (TextBox — stock quantity, locked, centered, bold)
+- **Properties:** Popup form
+- **Navigation:** Embedded as subform in frm_salesorder_retail, linked by order_number
+- **Status:** Recovered from 2019-09-07 backup (corrupt in all versions 2020+)
 
 ### Reports
 
@@ -2086,7 +2119,7 @@ Abandoned points usage table with 5 redemption slots (vs 3 in member_info).
 ```mermaid
 flowchart LR
     subgraph Entry["Entry"]
-        F1["frm_salesorder_retail\n(CORRUPT)"]
+        F1["frm_salesorder_retail\n(Recovered 2019)"]
         F2["customer_points_subform\n(real-time display)"]
         F3["remaining_points_form\n(standalone lookup)"]
     end
@@ -2291,10 +2324,10 @@ flowchart TB
         Q_union["product_and_material_report\n(UNION)"]
     end
 
-    subgraph Forms["Forms (17 total, 4 corrupt)"]
+    subgraph Forms["Forms (17 total, 4 recovered from 2019)"]
         direction LR
-        F_shop["frm_salesorder_fishingshop\n(CORRUPT)"]
-        F_ret["frm_salesorder_retail\n(CORRUPT)"]
+        F_shop["frm_salesorder_fishingshop\n(Recovered 2019)"]
+        F_ret["frm_salesorder_retail\n(Recovered 2019)"]
         F_recv["goods_receipt_form"]
         F_issue["goods_issue_form"]
         F_stock["product_stock_form"]
@@ -2479,13 +2512,13 @@ The query `assign_invoice_number` determines the next invoice number by querying
 
 ### Missing Features / Gaps
 
-**1. 4 corrupt forms -- core data entry path is damaged**
+**1. 4 forms recovered from 2019 backup -- core data entry path now fully documented**
 
-The two main order entry forms (`frm_salesorder_fishingshop`, `frm_salesorder_retail`) and two stock subforms (`frm_stck_fishingshop`, `qry stck subform2`) have corrupt VBA projects and cannot be exported. These are the primary data entry interfaces for the business.
+The two main order entry forms (`frm_salesorder_fishingshop`, `frm_salesorder_retail`) and two stock subforms (`frm_stck_fishingshop`, `qry stck subform2`) had corrupt VBA projects in all database versions from 2020 onward. All 4 were successfully recovered from the 2019-09-07 backup (`chong_softbaitx_2019-09-07.accdb`), which exported all 17 forms cleanly.
 
-*Impact:* The exact control layout, event handlers, and user flow of the main order forms must be inferred from subquery SQL, table schemas, and report references. HIGH confidence for both order forms; MEDIUM for frm_stck_fishingshop; LOW for qry stck subform2.
+*Caveat:* The 2019 version predates some later query additions (21 queries in 2019 vs 32 in 2024). The form designs may not reflect changes made between Sep 2019 and the corruption date (Jul 2020), though form control layouts rarely change in stable business systems.
 
-*Rebuild recommendation:* Use the inferred behavior documented in this blueprint. Build the new order forms based on the query data flows and report requirements. Validate with the business users during development.
+*Rebuild recommendation:* Use the recovered form definitions as the primary reference for control layout, data bindings, and event handlers. Cross-reference with the current query inventory (which reflects the latest DB version) to ensure all data flows are covered.
 
 **2. No audit trail**
 
@@ -2685,8 +2718,8 @@ Estimates assume a **solo developer** experienced in the chosen stack, building 
 | Component | Type | Domain | Size | Hours | Notes |
 |---|---|---|---|---|---|
 | Product list / edit screen | UI | Products | S | 2-4h | Simple data table + edit form |
-| Shop order entry form | UI | Orders | XL | 3-5d | Rebuild from corrupt form inference; header + line items + stock display + pricing preview + print triggers |
-| Retail order entry form | UI | Orders | XL | 3-5d | Rebuild from corrupt form inference; header + line items + stock + points display |
+| Shop order entry form | UI | Orders | XL | 3-5d | Rebuild from recovered 2019 form export; header + line items + stock display + pricing preview + print triggers |
+| Retail order entry form | UI | Orders | XL | 3-5d | Rebuild from recovered 2019 form export; header + line items + stock + points display |
 | Order lookup form | UI | Orders | S | 2-4h | Search by shop name, order number |
 | Goods receipt form + subform | UI | Inventory | L | 1-2d | Header + line items with product lookup |
 | Goods issue form + subform | UI | Inventory | L | 1-2d | Header + line items with product lookup |
@@ -2773,8 +2806,8 @@ Estimates assume a **solo developer** experienced in the chosen stack, building 
 #### Phase 3: Order Management (Estimated: 6-10 days)
 
 **What to build:**
-- Shop order entry form (rebuilt from corrupt form inference -- highest complexity component)
-- Retail order entry form (rebuilt from corrupt form inference)
+- Shop order entry form (rebuilt from recovered 2019 form export -- highest complexity component)
+- Retail order entry form (rebuilt from recovered 2019 form export)
 - Shop 2-tier pricing calculation (F-01 through F-05)
 - Retail pricing with loyalty points (F-06 through F-09)
 - Order lookup, sales totals, best sellers, and purchase summary queries
@@ -2874,7 +2907,7 @@ Estimates assume a **solo developer** experienced in the chosen stack, building 
 
 | Risk | Impact | Likelihood | Mitigation |
 |---|---|---|---|
-| Corrupt form reconstruction requires iterative user feedback | +2-4 weeks on order forms | Medium | Use HIGH-confidence inference from subquery SQL; validate early with users |
+| Recovered form design is from 2019 (pre-corruption); may differ slightly from 2020+ version | +1 week on order forms | Low | Recovered forms provide exact control layouts; cross-reference with current query inventory |
 | Data migration complexity (text PKs, Thai encoding, orphaned records) | +1-2 weeks | Medium | Build migration script early; run test migrations against copy of data |
 | Bilingual UI polish (Thai text wrapping, font rendering, label lengths) | +1-2 weeks | Medium | Use i18n framework from Phase 1; test Thai rendering on target devices early |
 | Report format matching (bills, tax invoices must match current layout) | +1-2 weeks | Low | Use exported report structure as reference; accept minor layout differences |
@@ -2886,8 +2919,8 @@ Estimates assume a **solo developer** experienced in the chosen stack, building 
 |---|---|---|
 | Database schema | HIGH | All 10 tables fully documented with column types, relationships, and constraints |
 | API / backend endpoints | HIGH | All 33 user queries documented with SQL and business logic; 11 formulas specified |
-| UI forms (non-corrupt) | HIGH | 7 exported forms have full control lists and data bindings |
-| UI forms (corrupt -- order entry) | MEDIUM | Both order forms inferred at HIGH level from subqueries and reports, but exact layout unknown |
+| UI forms (exported) | HIGH | 7 directly-exported forms have full control lists and data bindings |
+| UI forms (recovered from 2019) | HIGH | All 4 previously-corrupt forms recovered from 2019-09-07 backup with full control inventories, data bindings, and event handlers |
 | Reports | MEDIUM | 11 of 25 reports exported with controls; remaining inferred from ~sq_r subqueries |
 | Data migration | LOW | Dependent on Access export tools, Thai encoding handling, and data quality (orphaned records unknown) |
 | Infrastructure (auth, i18n, deploy) | HIGH | Standard patterns with well-known effort ranges |
@@ -2989,8 +3022,8 @@ Quick-lookup appendix organized by component type.
 
 | English Name | Thai Name | Domain | Status | Blueprint Section |
 |---|---|---|---|---|
-| frm_salesorder_fishingshop | frm_salesorder_fishingshop | Orders | Corrupt | [Orders Domain > Forms](#orders-domain) |
-| frm_salesorder_retail | frm_salesorder_retail | Orders | Corrupt | [Orders Domain > Forms](#orders-domain) |
+| frm_salesorder_fishingshop | frm_salesorder_fishingshop | Orders | Recovered (2019) | [Orders Domain > Forms](#orders-domain) |
+| frm_salesorder_retail | frm_salesorder_retail | Orders | Recovered (2019) | [Orders Domain > Forms](#orders-domain) |
 | order_line_items_subform | qry สินค้าในแต่ละออเดอร์ Subform | Orders | Exported | [Orders Domain > Forms](#orders-domain) |
 | shop_order_line_items_subform | qry สินค้าในแต่ละออเดอร์ร้านค้า subform | Orders | Not exported | [Orders Domain > Forms](#orders-domain) |
 | order_line_items_subform_1 | qry สินค้าในแต่ละออเดอร์ Subform1 | Orders | Not exported | [Orders Domain > Forms](#orders-domain) |
@@ -3000,8 +3033,8 @@ Quick-lookup appendix organized by component type.
 | goods_issue_form | frm เบิกสินค้า | Inventory | Not exported | [Inventory Domain > Forms](#inventory-domain) |
 | issue_line_items_subform | สินค้าในแต่ละใบเบิก Subform | Inventory | Exported | [Inventory Domain > Forms](#inventory-domain) |
 | product_stock_form | frm_สต็อคสินค้า | Inventory | Exported | [Inventory Domain > Forms](#inventory-domain) |
-| frm_stck_fishingshop | frm_stck_fishingshop | Inventory | Corrupt | [Inventory Domain > Forms](#inventory-domain) |
-| qry stck subform2 | qry stck subform2 | Inventory | Corrupt | [Inventory Domain > Forms](#inventory-domain) |
+| frm_stck_fishingshop | frm_stck_fishingshop | Inventory | Recovered (2019) | [Inventory Domain > Forms](#inventory-domain) |
+| qry stck subform2 | qry stck subform2 | Inventory | Recovered (2019) | [Inventory Domain > Forms](#inventory-domain) |
 | member_info_form | frmข้อมูลสมาชิก | Customers | Not exported | [Customers Domain > Forms](#customers-domain) |
 | remaining_points_form | คะแนนคงเหลือหลังจากใช้แล้ว | Customers | Exported | [Customers Domain > Forms](#customers-domain) |
 | customer_points_subform | qry คะแนนรวมลูกค้าแต่ละคน subform | Customers | Exported | [Customers Domain > Forms](#customers-domain) |
@@ -3042,4 +3075,4 @@ Quick-lookup appendix organized by component type.
 *Generated: 2026-02-16*
 *Source: epic_db.accdb (~10MB, Access 2007+ format)*
 *Assessment tool: access_parser_c + Jackcess 4.0.8 + Access COM (Windows)*
-*Total database objects: 84 (10 tables, 33 user queries, 29 system queries, 7 forms exported, 4 forms corrupt, 11 reports exported)*
+*Total database objects: 84 (10 tables, 33 user queries, 29 system queries, 11 forms exported (4 recovered from 2019 backup), 11 reports exported)*

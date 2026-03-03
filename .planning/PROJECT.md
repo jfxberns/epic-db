@@ -29,7 +29,7 @@ Supporting artifacts in `assessment/` and `scripts/` directories.
 
 - ✓ Extract all database tables with column definitions, data types, and relationships — v1.0
 - ✓ Document all queries with their SQL, purpose, and dependencies — v1.0
-- ✓ Catalogue all forms with their function, fields, and connected tables/queries — v1.0 (4 corrupt forms documented with inferred behavior)
+- ✓ Catalogue all forms with their function, fields, and connected tables/queries — v1.0 (4 previously-corrupt forms recovered from 2019 backup)
 - ✓ Catalogue all reports with purpose, data sources, and output format — v1.0
 - ✓ Extract all VBA modules with business logic explained in English — v1.0 (zero VBA found; all logic in SQL queries)
 - ✓ Document pricing and discount logic — v1.0 (11 formulas documented)
@@ -53,13 +53,13 @@ Supporting artifacts in `assessment/` and `scripts/` directories.
 ## Context
 
 - The .accdb file is located at `data/epic_db.accdb` (~10MB, no password)
-- Database scale: 10 tables, 33 user queries, 29 hidden subqueries, 7 exported forms, 4 corrupt forms, 11 reports
+- Database scale: 10 tables, 33 user queries, 29 hidden subqueries, 11 exported forms (4 recovered from 2019 backup), 11 reports
 - Data scale: 30,016 total rows, ~1,000 customers, ~10,000 orders, 8 products
 - All business logic lives in SQL calculated columns — zero VBA code-behind in any component
-- 4 forms with corrupt VBA projects are unrecoverable (frm_salesorder_fishingshop, frm_salesorder_retail, frm_stck_fishingshop, qry stck subform2)
+- 4 forms with corrupt VBA projects were recovered from the 2019-09-07 backup (frm_salesorder_fishingshop, frm_salesorder_retail, frm_stck_fishingshop, qry stck subform2) — corruption introduced between Sep 2019 and Jul 2020
 - Python 3.11 via uv with access_parser_c + Jackcess 4.0.8 (via JPype1) for macOS extraction
 - Windows (Access COM via UTM VM) used for SaveAsText form/report export
-- Codebase map at `.planning/codebase/`
+- Phase documents and verification reports in `.planning/phases/`
 
 ## Constraints
 
@@ -84,4 +84,4 @@ Supporting artifacts in `assessment/` and `scripts/` directories.
 | Next.js + PostgreSQL recommended | Best bilingual i18n, modern stack, good fit for simple CRUD | — Pending (rebuild not started) |
 
 ---
-*Last updated: 2026-02-16 after v1.0 milestone*
+*Last updated: 2026-03-03 — corrupt-form recovery complete, all todos closed*
